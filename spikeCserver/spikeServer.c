@@ -26,7 +26,7 @@ int main( int argc, char *argv[] )
     }
 
     /* Initialize socket structure */
-    bzero((char *) &serv_addr, sizeof(serv_addr));
+    memset((char *) &serv_addr, 0, sizeof(serv_addr));
     portno = 5000;
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
@@ -53,8 +53,8 @@ int main( int argc, char *argv[] )
 
     while (strcmp(end, contentBuffer) !=0)
     {
-        bzero(buffer,256);
-        bzero(contentBuffer,255);
+        memset(buffer,0,256);
+        memset(contentBuffer,0,255);
         /* If connection is established then start communicating */
         n = read( clisockfd,buffer,255 );
         if (n < 0)
