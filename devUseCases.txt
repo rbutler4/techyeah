@@ -61,8 +61,8 @@ Section 1.2: methods Server to Client
 	COMMENTS:	none
 	
 	NAME:	setPowerup
-	INPUT:	int flag
-	DESCRIPTION:	takes an int and sends to client that tells they got a powerup
+	INPUT:	char player, int flag
+	DESCRIPTION:	takes a char and int and sends to clients that tells a client got a powerup
 	COMMENTS:	flags
 				1 == got wrecking ball powerup
 				2 == got chisel powerup
@@ -124,10 +124,10 @@ Section 2.3: word submission
 
 Section 2.4: gaining powerup
 	Flow:
-	Client								Server
-								(reqirments are meet that a client gets a powerup)
-	(accept setPowerup)	<-	<-	(method setPowerup(<powerup>)
-	
+	Client A							Server											Client B
+								(reqirments are meet that a client A gets a powerup)
+	(accept setPowerup)	<-	<-	(method setPowerup('A', <powerup>)	->	->	->	->	->	(accept setPowerup)
+
 Section 2.5: using powerup
 	Flow:
 	Client								Server													Client
