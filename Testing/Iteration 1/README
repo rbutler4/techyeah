@@ -1,3 +1,9 @@
+FOR GameServer:
+two clients need to connect to the server before you can test. If you send anything to the server before it says "New Game Started:" it screws up and you need to close both clients and the server.
+
+the C server listens on port 5000
+the GameServer listens on port 8128
+
 This is a modified version of a c server and java client based off of code found at: 
 https://stackoverflow.com/questions/19561941/socket-comunication-java-client-c-server
 
@@ -10,8 +16,10 @@ Exit client with "exit" or <cntl+C>
 
 to compile:
 gcc -Wall -Werror spikeServer.c -o spikeServer
+javac GameServer
 javac spikeClient
 
 to run with local host in seperate cmd windows:
 ./spikeServer
+java GameServer
 java spikeClient 127.0.0.1 5000
