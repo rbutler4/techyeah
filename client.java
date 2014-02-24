@@ -175,7 +175,7 @@ public class client{
 			Matcher m;
 			for(int i=0; i<args.length; i++){
 				System.out.print((DEBUG)?"args["+i+"]: "+args[i]+"\n":"");
-				// temp = args[i];
+				temp = "";
 				m = IPv4.matcher(args[i]);
 				if(m.matches()){
 					System.out.print((DEBUG)?"match host\n":"");
