@@ -211,23 +211,6 @@ public class client{
 			}
 		}
 
-		// if(args.length == 1){
-		// 	try{
-		// 		int temp = Integer.parseInt(args[0]);
-		// 		if(temp > 1024 && temp < 65535){
-		// 			client.port = temp;
-		// 		} else {
-		// 			client.port = DEFAULT_PORT;
-		// 		}
-		// 	} catch(NumberFormatException err){
-		// 		System.err.println(err);
-		// 		client.port = DEFAULT_PORT;
-		// 	}
-		// } else {
-		// 	client.port = DEFAULT_PORT;
-		// }
-		// client.host = DEFAULT_HOST;
-
 		System.out.print((DEBUG)?"host: "+client.host+"\n":"");
 		System.out.print((DEBUG)?"port: "+client.port+"\n":"");
 
