@@ -1,0 +1,17 @@
+This is a modified version of a c server and java client based off of code found at: 
+https://stackoverflow.com/questions/19561941/socket-comunication-java-client-c-server
+
+The client takes a string from stdin and sends it to the server and receives a confirmation.
+The server needs to run on linux.
+The server receives a string from the client and prints it to stdout and sends a confirmation.
+Key word "hello" receives a special confirmation.
+Key word "bye" closes connection to server but leaves client running.
+Exit client with "exit" or <cntl+C>
+
+to compile:
+gcc -Wall -Werror spikeServer.c -o spikeServer
+javac spikeClient
+
+to run with local host in seperate cmd windows:
+./spikeServer
+java spikeClient 127.0.0.1 5000
