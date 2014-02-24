@@ -19,7 +19,7 @@ gcc -Wall -Werror spikeServer.c -o spikeServer
 javac GameServer
 javac spikeClient
 
-to run with local host in seperate cmd windows:
+to run with local host in seperate cmd windows (two clients are required for GameServer):
 ./spikeServer
 java GameServer
-java spikeClient 127.0.0.1 5000
+java spikeClient 127.0.0.1 [port]
