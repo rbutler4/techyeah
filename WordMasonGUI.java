@@ -47,7 +47,8 @@ public class WordMasonGUI extends javax.swing.JFrame {
     
     private int wallHeight = 0;
     private JTextField[] wallFields;
-    private String currBank;
+    private String currBankLetters;
+    private String nextBankLetters;
     private client CL;
    
     /**
@@ -359,14 +360,10 @@ public class WordMasonGUI extends javax.swing.JFrame {
         }
     }                                       
 
-    
-    
-    private void submitButtonPressed(java.awt.event.ActionEvent evt) {                                     
-        String word = inputField.getText();
-        
-        currBank = currBank.toLowerCase();
+    private void submitWord(String word) {
+        currBankLetters = currBankLetters.toLowerCase();
         word = word.toLowerCase();
-        char[] bankChars = currBank.toCharArray();
+        char[] bankChars = currBankLetters.toCharArray();
         char[] wordChars = word.toCharArray();
         int lettersUsed = 0;
         for (int i = 0; i < bankChars.length; i++) {
@@ -388,11 +385,20 @@ public class WordMasonGUI extends javax.swing.JFrame {
             CL.word(word);
             //addWord(word);
         }
+    }
+    
+    private void submitButtonPressed(java.awt.event.ActionEvent evt) {                                     
+        String word = inputField.getText();
+        submitWord(word);
     }                                    
 
-    public void setBank(String bank) {
-        currBank = bank;
-        currBankLabel.setText(currBank);
+    public void setBank(String letters) {
+        currBankLetters = letters;
+        currBankLabel.setText(currBankLetters);
+    }
+    
+    public void setNextBank(String letters) {
+        nextBankLetters = letters;
     }
     
     public void setPlayerOneScore(int score) {
@@ -407,9 +413,9 @@ public class WordMasonGUI extends javax.swing.JFrame {
         wallFields[wallHeight].setText(word);
         wallHeight++;
         
-        currBank = currBank.toLowerCase();
+        currBankLetters = currBankLetters.toLowerCase();
         word = word.toLowerCase();
-        char[] bankChars = currBank.toCharArray();
+        char[] bankChars = currBankLetters.toCharArray();
         char[] wordChars = word.toCharArray();
         for (int i = 0; i < bankChars.length; i++) {
             char bankLetter = bankChars[i];
