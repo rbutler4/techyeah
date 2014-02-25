@@ -29,6 +29,80 @@ public class client{
 	private static char player = 'x';
 	private static String nextBank = null;
 
+	// CONSTRUCTOR
+	// name:   client
+	// input:  [none]
+	// description:  sets host and port to defaults
+	public client(){
+		host = DEFAULT_HOST;
+		port = DEFAULT_PORT;
+
+		System.out.print((DEBUG)?"host: "+host+"\n":"");
+		System.out.print((DEBUG)?"port: "+port+"\n":"");
+	}
+
+	// CONSTRUCTOR
+	// name:   client
+	// input:  String
+	// description:  sets port to default and host to input if valid, else default
+	public client(String hos){
+		host = DEFAULT_HOST;
+		port = DEFAULT_PORT;
+
+		Pattern IPv4 = Pattern.compile("\\d*\\.\\d*\\.\\d*\\.\\d*");	// *.*.*.*
+		Matcher m;
+		m = IPv4.matcher(hos);
+		if(m.matches()){
+			host = hos;
+		}
+
+		System.out.print((DEBUG)?"host: "+host+"\n":"");
+		System.out.print((DEBUG)?"port: "+port+"\n":"");
+	}
+
+	// CONSTRUCTOR
+	// name:   client
+	// input:  int
+	// description:  sets host to default and port to input if valid, else default
+	public client(int por){
+		host = DEFAULT_HOST;
+		port = DEFAULT_PORT;
+
+		Pattern p = Pattern.compile("\\d*");	// any number of digits
+		Matcher m;
+		m = p.matcher(Integer.toString(por));
+		if(m.matches() && por > 1024 && por < 65535){
+			port = por;
+		}
+
+		System.out.print((DEBUG)?"host: "+host+"\n":"");
+		System.out.print((DEBUG)?"port: "+port+"\n":"");
+	}
+
+	// CONSTRUCTOR
+	// name:   client
+	// input:  String, int
+	// description:  sets host and port to input if valid, else defaults
+	public client(String hos, int por){
+		host = DEFAULT_HOST;
+		port = DEFAULT_PORT;
+
+		Pattern IPv4 = Pattern.compile("\\d*\\.\\d*\\.\\d*\\.\\d*");	// *.*.*.*
+		Pattern p = Pattern.compile("\\d*");	// any number of digits
+		Matcher m;
+		m = IPv4.matcher(hos);
+		if(m.matches()){
+			host = hos;
+		}
+		m = p.matcher(Integer.toString(por));
+		if(m.matches() && por > 1024 && por < 65535){
+			port = por;
+		}
+
+		System.out.print((DEBUG)?"host: "+host+"\n":"");
+		System.out.print((DEBUG)?"port: "+port+"\n":"");
+	}
+
 	// name:   setGUI
 	// input:  WordMasonGUI
 	// description:  sets the WordMasonGUI to calling instance so we can send messages to it
@@ -221,11 +295,60 @@ public class client{
 		}
 	}
 
-	// TODO: seperate into constructors, destructor, and connect methods
+	// name:   connect
+	// input:  [none]
+	// description:  connects to server, plays game, closes sockets and streams
+	public static void connect(){
+		// check that we have a host and port or use defaults
+		if(host==null){
+			host = DEFAULT_HOST;
+		}
+		if(port==-1){
+			port=DEFAULT_PORT;
+		}
+
+		// set up socket, output stream, input stream
+		System.out.print((DEBUG)?"connecting...":"");
+		try{
+			sock = new Socket(host, port);
+			output = new PrintWriter(sock.getOutputStream(), true);
+			input = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+			System.out.print((DEBUG)?"connected\n":"");
+		} catch(UnknownHostException err){
+			System.out.print((DEBUG)?"failed\n":"");
+			System.err.println(err);
+		} catch(IOException err){
+			System.out.print((DEBUG)?"failed\n":"");
+			System.err.println(err);
+		}
+
+		// connected to server, now listen for input
+		if(sock != null && output != null && input != null){
+			// create and run listening/parsing thread
+			listenThread lt = new listenThread(sock, output, input);
+			lt.start();
+
+			// while thread is alive (Game is being played)
+			while(lt.isAlive()){
+				// wait for client-to-server messages
+			}
+		}
+
+		// close streams and socket
+		try{
+			input.close();
+			output.close();
+			sock.close();
+		} catch(IOException err){
+			System.err.println(err);
+		}
+	}
+
+	// redundent: seperate into constructors, and connect
 	public static void main(String [] args){
 		// parse cmd args for host and port or use defaults
-		client.host = DEFAULT_HOST;
-		client.port = DEFAULT_PORT;
+		host = DEFAULT_HOST;
+		port = DEFAULT_PORT;
 		if(0<args.length){
 			String temp = null;
 			Pattern IPv4 = Pattern.compile("\\d*\\.\\d*\\.\\d*\\.\\d*");	// *.*.*.*
@@ -249,19 +372,19 @@ public class client{
 
 				switch(temp){
 					case "host":
-						client.host = args[i];
+						host = args[i];
 						break;
 					case "port":
 						try{
 							int tempInt = Integer.parseInt(args[i]);
 							if(tempInt > 1024 && tempInt < 65535){
-								client.port = tempInt;
+								port = tempInt;
 							} else {
-								client.port = DEFAULT_PORT;
+								port = DEFAULT_PORT;
 							}
 						} catch(NumberFormatException err){
 							System.err.println(err);
-							client.port = DEFAULT_PORT;
+							port = DEFAULT_PORT;
 						}
 						break;
 					default:
@@ -270,8 +393,8 @@ public class client{
 			}
 		}
 
-		System.out.print((DEBUG)?"host: "+client.host+"\n":"");
-		System.out.print((DEBUG)?"port: "+client.port+"\n":"");
+		System.out.print((DEBUG)?"host: "+host+"\n":"");
+		System.out.print((DEBUG)?"port: "+port+"\n":"");
 
 		// test parse
 		// if(DEBUG){
@@ -305,7 +428,7 @@ public class client{
 		// set up socket, output stream, input stream
 		System.out.print((DEBUG)?"connecting...":"");
 		try{
-			sock = new Socket(client.host, client.port);
+			sock = new Socket(host, port);
 			output = new PrintWriter(sock.getOutputStream(), true);
 			input = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 			System.out.print((DEBUG)?"connected\n":"");
