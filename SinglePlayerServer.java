@@ -9,19 +9,11 @@ import java.util.HashMap;
 
 public class SinglePlayerServer {
 	public HashMap dictionary;
-	public String file;
+	public String file = "2of4brif.txt";
 	
-	public void main (String [] args){
-		if (args.length == 1){
-			file = args[0];
-			populate();
-			ListenerThread clientReceiver = new ListenerThread(this);
+	public static void main (String [] args){
+			ListenerThread clientReceiver = new ListenerThread(new SinglePlayerServer());
 			clientReceiver.start();
-		}
-			
-		else {
-			System.out.println("Requires dictionary filename");
-		}
 	}
 	
 	public void populate(){
@@ -31,13 +23,17 @@ public class SinglePlayerServer {
 	        BufferedReader buffRead = new BufferedReader (reader);
 	        totalCount = (int) Integer.parseInt(buffRead.readLine());
 	        for (int i =1; i< totalCount; i++) {
-				dictionary.put(buffRead.readLine(),new Object());
+				this.dictionary.put(buffRead.readLine(),new Object());
 	        }
 		 } catch(FileNotFoundException e){
 	         e.printStackTrace();
 	     } catch (IOException e) {
 	         e.printStackTrace();
 	     }
+	}
+	public SinglePlayerServer(){
+		super();
+		this.dictionary = new HashMap();
 	}
 }
 
@@ -53,6 +49,7 @@ class ListenerThread extends Thread {
 
 
 	public void run(){
+		launcher.populate();
 		try {
 			server = new ServerSocket(8128);
 			while(true){

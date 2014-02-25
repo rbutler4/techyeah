@@ -1,0 +1,147 @@
+Developer Use Cases and methods for client and server interactions.
+sections
+	1		methods				line 15
+	1.1		Client-to-Server	line 22
+	1.2		Server-to-Client	line 38
+	2		UseCases			line 76
+	2.1		setting up game		line 77
+	2.2		letter bank update	line 98
+	2.3		word submission		line 109
+	2.4		gaining powerup		line 125
+	2.5		using powerup		line 131
+	2.6		quiting game		line 137
+	2.7		ending game			line 143
+
+Section 1: methods
+	methods will be sent as a space seperated string.
+	examples:	"word dog"
+				"wordWallUpdate 0 46 28 dog"
+				"setPowerup 2"
+				"timeOut FALSE"
+
+Section 1.1: methods Client to Server
+	NAME:	update
+	INPUT:	int flag
+	DESCRIPTION:	takes an int 0-4 and sends it to the server.
+	COMMENTS:	flags
+				0 == start game (redundent)
+				1 == use wrecking ball powerup
+				2 == use chisel powerup
+				3 == use theif powerup
+				4 == quit game
+	
+	NAME:	word
+	INPUT:	string word
+	DESCRIPTION:	takes a string and sends it to the server to validate and add to word wall.
+	COMMENTS:	none
+
+Section 1.2: methods Server to Client
+	NAME:	wordWallUpdate
+	INPUT:	int wallFlag, int scoreA, int scoreB, string word
+	DESCRIPTION:	takes an int, int, int, string and sends to client to update the word wall with powerups or word and update player scores.
+	COMMENTS:	wallFlags
+				0 == add word to wall
+				1 == use wrecking ball powerup on wall
+				2 == use chisel powerup on wall
+				3 == use thief powerup on wall
+	
+	NAME:	letterBankUpdate
+	INPUT:	string bank
+	DESCRIPTION:	takes a string that is the new letter bank ans sends to client
+	COMMENTS:	none
+	
+	NAME:	setPlayer
+	INPUT:	char player
+	DESCRIPTION:	takes a char that will set which client is which player
+	COMMENTS:	none
+	
+	NAME:	timeOut
+	INPUT:	boolean
+	DESCRIPTION:	takes a boolean and sends to client.  If TRUE then game setup times out.  If FALSE then starting game with another player.
+	COMMENTS:	none
+	
+	NAME:	setPowerup
+	INPUT:	char player, int flag
+	DESCRIPTION:	takes a char and int and sends to clients that tells a client got a powerup
+	COMMENTS:	flags
+				1 == got wrecking ball powerup
+				2 == got chisel powerup
+				3 == got theif powerup
+	
+	NAME:	endGame
+	INPUT:	int scoreA, int scoreB
+	DESCRIPTION:	takes scores of players A and B and sends to clients. Client ends game with final scores.
+	COMMENTS:	none
+
+Section 2: Use Cases
+Section 2.1: setting up a game
+	Flow:
+	Client								Server							Client
+								(waiting for connections)
+	(connect to server)	->	->	->	(accept connection)
+								(waiting for connections)
+									(accept connection)	<-	<-	<-	(connect to server)
+	(accept timeOut(FALSE))	<-	<-	(method timeOut(FALSE))	->	->	(accept timeOut(FALSE))
+	(accept setPlayer('A'))	<-	<-	(method setPlayer('A'))
+									(method setPlayer('B"))	->	->	(accept setPlayer('B'))
+								(game is set up, ready to start)
+
+	Alternative Flow 1:
+	Client								Server							Client
+								(waiting for connections)
+	(connect to server)	->	->	->	(accept connection)
+									(finding another player times out)
+	(accept timeOut(TRUE))	<-	<-	(method timeOut(TRUE))
+									(game is not set up)
+
+
+Section 2.2: letter bank update
+	Flow
+	Client								Server													Client
+									(bank timer runs out)
+	(accept letterBankUpdate)	<-	(method letterBankUpdate(1, <new letter bank>)	->	(accept letterBankUpdate)
+
+	Alternative Flow 1:
+	Client								Server													Client
+									(start of game)
+	(accept letterBankUpdate)	<-	(method letterBankUpdate(1, <new letter bank>)	->	(accept letterBankUpdate)
+	
+Section 2.3: word submission
+	Flow:
+	Client								Server												Client
+	(method word(<word>))	->	->	(accept word(<word>))
+									(validate word)
+									(valid word)
+	(accept wordWallUpdate)	<-	<-	(method WordWallUpdate(0, <>, <>, <word>))	->	->	(accept wordWallUpdate)
+	(update word wall)																	(update word wall)
+	
+	Alternative Flow 1:
+	Client								Server							Client
+	(method word(<word>))	->	->	(accept word(<word>))
+									(validate word)
+									(invalid word)
+	(accept invalid)	<-	<-	<-	(method invalid(<word>))
+
+Section 2.4: gaining powerup
+	Flow:
+	Client A							Server											Client B
+								(reqirments are meet that a client A gets a powerup)
+	(accept setPowerup)	<-	<-	(method setPowerup('A', <powerup>)	->	->	->	->	->	(accept setPowerup)
+
+Section 2.5: using powerup
+	Flow:
+	Client								Server													Client
+	(method Update(1-3))	->	->	->	(accept Update)
+	(accept wordWallUpdate)	<-	<-	<-	(method wordWallUpdate(1-3, <score A>, <score B>, <blank>))	->	(accept wordWallUpdate)
+	
+Section 2.6: quiting game
+	Flow:
+	Client								Server										Client
+	(method Update(4))	->	->	->	->(accept Update)
+	(accept endGame)	<-	<-	(method endGame(<score A>, <score B>))	->	->	(accept endGame)
+
+Section 2.7: ending game
+	Flow:
+	Client								Server										Client
+									(word wall is full)
+	(accept endGame)	<-	<-	(method endGame(<score A>, <score B>))	->	->	(accept endGame)

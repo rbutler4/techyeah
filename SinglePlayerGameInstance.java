@@ -26,11 +26,12 @@ public class SinglePlayerGameInstance {
 	}
 
 	public void run(){
-		timeStamp1 = timeStamp2 = System.currentTimeMillis();
-		sendMessage("Connected to server");
+		//sendMessage("Connected to server\n");
 		
 		while (!exit){
-			while (timeStamp2 - timeStamp1 < 20000){
+			timeStamp1 = timeStamp2 = System.currentTimeMillis();
+			sendMessage("letterBankUpdate " + getLetterBank());
+			while (timeStamp2 - timeStamp1 < 20000 && !exit){
 				try{
 					Thread.sleep(10);
 					InputStream fromPlayer = player.getInputStream();
@@ -56,6 +57,7 @@ public class SinglePlayerGameInstance {
 					e.printStackTrace();
 				}
 				timeStamp2 = System.currentTimeMillis();
+				System.out.println(timeStamp2-timeStamp1);
 			}
 		}
 	}
@@ -90,6 +92,10 @@ public class SinglePlayerGameInstance {
 	public Integer score(String playerWord){
 		int letterCount = playerWord.length();
 		return (Integer) (letterCount*letterCount);
+	}
+	
+	public String getLetterBank(){
+		return "awholebunchofletters\n";
 	}
 
 	public void sendMessage (String message){
