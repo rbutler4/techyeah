@@ -25,8 +25,21 @@ public class client{
 	private static Socket sock = null;
 	private static BufferedReader input = null;
 	private static PrintWriter output = null;
+	private static WordMasonGUI GUI = null;
+	private static char player = 'x';
+	private static String nextBank = null;
 
-	// send update(int flag) to server
+	// name:   setGUI
+	// input:  WordMasonGUI
+	// description:  sets the WordMasonGUI to calling instance so we can send messages to it
+	public static void setGUI(WordMasonGUI inst){
+		GUI = inst;
+		System.out.print((DEBUG)?"WordMasonGUI set\n":"");
+	}
+
+	// name:   update
+	// input:  int
+	// description:  send update(int flag) to server
 	public static void update(int flag){
 		// check if connected to server and can read & write
 		if(sock != null && output != null && input != null){
@@ -38,7 +51,9 @@ public class client{
 		}
 	}
 
-	// send word(String word) to server
+	// name:   word
+	// input:  String
+	// description:  send word(String word) to server
 	public static void word(String word){
 		// check if connected to server and can read & write
 		if(sock != null && output != null && input != null){
@@ -50,13 +65,15 @@ public class client{
 		}
 	}
 
-	// parses a string then calls apporpriate GUI method
+	// name:   parse
+	// input:  String
+	// description:  parses a string then calls apporpriate GUI method(s)
 	public static void parse(String msg){
 		System.out.print((DEBUG)?"parse msg: "+msg+"\n":"");
 		int flag;
 		int scoreA;
 		int scoreB;
-		char player;
+		char play;
 		Boolean t;
 		String str;
 
@@ -80,7 +97,25 @@ public class client{
 							break;
 						}
 						System.out.print((DEBUG)?"wordWallUpdate("+flag+", "+scoreA+", "+scoreB+", "+str+")\n":"");
-						//GUI.wordWallUpdate(flag,scoreA,scoreB,str);
+						switch(flag){
+							// add word
+							case 0:
+								GUI.submitWord(str);
+								if(player == 'A'){
+									GUI.setPlayerOneScore(scoreA);
+									GUI.setPlayerTwoScore(scoreB);
+								} else {  // player B
+									GUI.setPlayerOneScore(scoreB);
+									GUI.setPlayerTwoScore(scoreA);
+								}
+								break;
+							// use powerup
+							default:
+								// GUI.powerupUsed(flag);
+								// GUI.setPlayerOneScore(scoreA);
+								// GUI.setPlayerTwoScore(scoreB);
+								break;
+						}
 					} else {
 						System.out.print((DEBUG)?"invalid wordWallUpdate\n":"");
 					}
@@ -91,7 +126,12 @@ public class client{
 					if(2==tokens.length){
 						str = tokens[1];
 						System.out.print((DEBUG)?"letterBankUpdate("+str+")\n":"");
-						//GUI.letterBankUpdate(str);
+						if(nextBank != null){
+							GUI.setBank(nextBank);
+							GUI.setNextBank(str);
+						} else {  // first bank update, assumes another bank update is comming soon
+							nextBank = str;
+						}
 					} else {
 						System.out.print((DEBUG)?"invalid letterBankUpdate\n":"");
 					}
@@ -100,9 +140,9 @@ public class client{
 				// setPlayer (char player)
 				case "setPlayer":
 					if(2==tokens.length){
-						player = tokens[1].charAt(0);
-						System.out.print((DEBUG)?"setPlayer("+player+")\n":"");
-						//GUI.setPlayer(player);
+						play = tokens[1].charAt(0);
+						System.out.print((DEBUG)?"setPlayer("+play+")\n":"");
+						player = play;
 					} else {
 						System.out.print((DEBUG)?"invalid setPlayer\n":"");
 					}
@@ -113,7 +153,9 @@ public class client{
 					if(2==tokens.length){
 						t = Boolean.valueOf(tokens[1]);
 						System.out.print((DEBUG)?"timeOut("+t+")\n":"");
-						//GUI.timeOut(t);
+						if(t){
+							GUI.timeOutDialog();
+						}
 					} else {
 						System.out.print((DEBUG)?"invalid timeOut\n":"");
 					}
@@ -122,15 +164,23 @@ public class client{
 				// setPowerup (char player, int flag)
 				case "setPowerup":
 					if(3==tokens.length){
-						player = tokens[1].charAt(0);
+						play = tokens[1].charAt(0);
 						try{
 							flag = Integer.parseInt(tokens[2]);
 						} catch(NumberFormatException err){
 							System.err.println(err);
 							break;
 						}
-						System.out.print((DEBUG)?"setPowerup("+player+", "+flag+")\n":"");
-						//GUI.setPowerup(player,flag);
+						System.out.print((DEBUG)?"setPowerup("+play+", "+flag+")\n":"");
+						if(play == 'A' && player == 'A'){
+							// GUI.setPlayerOnePowerup(flag);
+						} else if(play == 'A'){ // && player B
+							// GUI.setPlayerTwoPowerup(flag);
+						} else if(play == 'B' && player == 'A'){
+							// GUI.setPlayerTwoPowerup(flag);
+						} else {	// play B && player B
+							// GUI.setPlayerOnePowerup(flag);
+						}
 					} else {
 						System.out.print((DEBUG)?"invalid setPowerup\n":"");
 					}
@@ -147,7 +197,15 @@ public class client{
 							break;
 						}
 						System.out.print((DEBUG)?"endGame("+scoreA+", "+scoreB+")\n":"");
-						//GUI.endGame(scoreA,scoreB);
+						if(player == 'A'){
+							GUI.setPlayerOneScore(scoreA);
+							GUI.setPlayerTwoScore(scoreB);
+							GUI.gameOverDialog();
+						} else {  // player B
+							GUI.setPlayerOneScore(scoreB);
+							GUI.setPlayerTwoScore(scoreA);
+							GUI.gameOverDialog();
+						}
 					} else {
 						System.out.print((DEBUG)?"invalid endGame\n":"");
 					}
@@ -163,8 +221,9 @@ public class client{
 		}
 	}
 
+	// TODO: seperate into constructors, destructor, and connect methods
 	public static void main(String [] args){
-		// check argument port or use default port
+		// parse cmd args for host and port or use defaults
 		client.host = DEFAULT_HOST;
 		client.port = DEFAULT_PORT;
 		if(0<args.length){

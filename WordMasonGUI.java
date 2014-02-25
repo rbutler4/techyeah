@@ -43,6 +43,13 @@ public class WordMasonGUI extends javax.swing.JFrame {
         setBank("ABCDEFGHIJKLMNOPQRS");
         toggleGameState(false);
         CL = new client();
+        CL.setGUI(this);    // lets client know to talk to this GUI
+
+        // TODO: create constructor, destructor, connect in client
+        String[] args = new String[2];  // needed for main of client
+        // args[0] = "host";  // set for non-default host. default is 127.0.0.1
+        // args[1] = "port";  // set for non-default port. default is 5000
+        CL.main(args); // GUI program hangs if client cannot connect
     }
     
     private int wallHeight = 0;
@@ -360,7 +367,7 @@ public class WordMasonGUI extends javax.swing.JFrame {
         }
     }                                       
 
-    private void submitWord(String word) {
+    public void submitWord(String word) {
         currBankLetters = currBankLetters.toLowerCase();
         word = word.toLowerCase();
         char[] bankChars = currBankLetters.toCharArray();
