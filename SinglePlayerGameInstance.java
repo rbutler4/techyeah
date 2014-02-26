@@ -58,7 +58,7 @@ public class SinglePlayerGameInstance {
 					e.printStackTrace();
 				}
 				timeStamp2 = System.currentTimeMillis();
-				System.out.println(timeStamp2-timeStamp1);
+				//System.out.println(timeStamp2-timeStamp1);
 			}
 		}
 	}
