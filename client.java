@@ -1,3 +1,5 @@
+
+
 /*
 *	Java threaded Client
 *	iteration 2.0
@@ -174,7 +176,7 @@ public class client{
 						switch(flag){
 							// add word
 							case 0:
-								GUI.submitWord(str);
+								GUI.addWord(str);
 								if(player == 'A'){
 									GUI.setPlayerOneScore(scoreA);
 									GUI.setPlayerTwoScore(scoreB);
@@ -327,20 +329,6 @@ public class client{
 			// create and run listening/parsing thread
 			listenThread lt = new listenThread(sock, output, input);
 			lt.start();
-
-			// while thread is alive (Game is being played)
-			while(lt.isAlive()){
-				// wait for client-to-server messages
-			}
-		}
-
-		// close streams and socket
-		try{
-			input.close();
-			output.close();
-			sock.close();
-		} catch(IOException err){
-			System.err.println(err);
 		}
 	}
 
@@ -446,20 +434,9 @@ public class client{
 			listenThread lt = new listenThread(sock, output, input);
 			lt.start();
 
-			// while thread is alive (Game is being played)
-			while(lt.isAlive()){
-				// wait for client-to-server messages
-			}
+			
 		}
 
-		// close streams and socket
-		try{
-			input.close();
-			output.close();
-			sock.close();
-		} catch(IOException err){
-			System.err.println(err);
-		}
 	}
 }
 
@@ -492,7 +469,11 @@ class listenThread extends Thread{
 						client.parse(temp);
 					}
 				}
-			} catch(IOException err){
+				input.close();
+				output.close();
+				sock.close();
+				
+			} catch(IOException | NullPointerException err){
 				System.err.println(err);
 			}
 		}
