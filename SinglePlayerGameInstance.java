@@ -41,9 +41,10 @@ public class SinglePlayerGameInstance {
 						fromPlayer.read(receivedByte);
 						gameMessage = updateStatus(new String(receivedByte));
 						sendMessage(gameMessage);
+						byteNum = 0;
 					}
 					if (wallHeight >=SinglePlayerGameInstance.MAX_WALL_HEIGHT){
-						sendMessage("endGame "+playerScore.toString()+" 0");
+						sendMessage("endGame "+playerScore.toString()+" 0\n");
 						exit = true;
 					}
 					
