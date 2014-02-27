@@ -1,5 +1,3 @@
-
-
 /*
 *	Java threaded Client
 *	iteration 2.0
