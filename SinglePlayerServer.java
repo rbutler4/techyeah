@@ -41,6 +41,8 @@ public class SinglePlayerServer {
 class ListenerThread extends Thread {
 	public SinglePlayerServer launcher;
 	public ServerSocket server;
+	public Socket newGameSocket;
+	public SinglePlayerGameInstance newGame;
 	
 	
 	public ListenerThread(SinglePlayerServer launcher) {
@@ -54,7 +56,11 @@ class ListenerThread extends Thread {
 			server = new ServerSocket(8128);
 			while(true){
 				Thread.sleep(50);
-				new SinglePlayerGameInstance(launcher.dictionary,server.accept()).run();
+				newGameSocket = server.accept();
+				newGame = new SinglePlayerGameInstance(launcher.dictionary,newGameSocket);
+				System.out.println("Launched SinglePlayerGameInstance");
+				newGame.run();
+				System.out.println("Run SinglePlayerGameInstance");
 			}
 		} catch (IOException e) {
 			System.err.println("Something went wrong. Maybe the port is blocked? (8128)");
