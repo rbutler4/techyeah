@@ -34,6 +34,7 @@ public class client{
 	// CONSTRUCTOR
 	// name:   client
 	// input:  [none]
+	// output: [none]
 	// description:  sets host and port to defaults
 	public client(){
 		host = DEFAULT_HOST;
@@ -46,6 +47,7 @@ public class client{
 	// CONSTRUCTOR
 	// name:   client
 	// input:  String
+	// output: [none]
 	// description:  sets port to default and host to input if valid, else default
 	public client(String hos){
 		host = DEFAULT_HOST;
@@ -65,6 +67,7 @@ public class client{
 	// CONSTRUCTOR
 	// name:   client
 	// input:  int
+	// output: [none]
 	// description:  sets host to default and port to input if valid, else default
 	public client(int por){
 		host = DEFAULT_HOST;
@@ -84,6 +87,7 @@ public class client{
 	// CONSTRUCTOR
 	// name:   client
 	// input:  String, int
+	// output: [none]
 	// description:  sets host and port to input if valid, else defaults
 	public client(String hos, int por){
 		host = DEFAULT_HOST;
@@ -107,6 +111,7 @@ public class client{
 
 	// name:   setGUI
 	// input:  WordMasonGUI
+	// output: [none]
 	// description:  sets the WordMasonGUI to calling instance so we can send messages to it
 	public static void setGUI(WordMasonGUI inst){
 		GUI = inst;
@@ -115,6 +120,7 @@ public class client{
 
 	// name:   update
 	// input:  int
+	// output: [none]
 	// description:  send update(int flag) to server
 	public static void update(int flag){
 		// check if connected to server and can read & write
@@ -129,6 +135,7 @@ public class client{
 
 	// name:   word
 	// input:  String
+	// output: [none]
 	// description:  send word(String word) to server
 	public static void word(String word){
 		// check if connected to server and can read & write
@@ -143,6 +150,7 @@ public class client{
 
 	// name:   parse
 	// input:  String
+	// output: [none]
 	// description:  parses a string then calls apporpriate GUI method(s)
 	public static void parse(String msg){
 		System.out.print((DEBUG)?"parse msg: "+msg+"\n":"");
@@ -205,6 +213,7 @@ public class client{
 						if(nextBank != null){
 							GUI.setBank(nextBank);
 							GUI.setNextBank(str);
+							nextBank = str;
 						} else {  // first bank update, assumes another bank update is comming soon
 							nextBank = str;
 						}
@@ -299,6 +308,7 @@ public class client{
 
 	// name:   connect
 	// input:  [none]
+	// output: [none]
 	// description:  connects to server, plays game, closes sockets and streams
 	public static void connect(){
 		// check that we have a host and port or use defaults
@@ -331,113 +341,6 @@ public class client{
 			lt.start();
 		}
 	}
-
-	// redundent: seperate into constructors, and connect
-	public static void main(String [] args){
-		// parse cmd args for host and port or use defaults
-		host = DEFAULT_HOST;
-		port = DEFAULT_PORT;
-		if(0<args.length){
-			String temp = null;
-			Pattern IPv4 = Pattern.compile("\\d*\\.\\d*\\.\\d*\\.\\d*");	// *.*.*.*
-			//Pattern IPv6 = Pattern.compile("");	// *:*:*:*:*:*:*:*
-			Pattern p = Pattern.compile("\\d*");	// any number of digits
-			Matcher m;
-			for(int i=0; i<args.length; i++){
-				System.out.print((DEBUG)?"args["+i+"]: "+args[i]+"\n":"");
-				temp = "";
-				m = IPv4.matcher(args[i]);
-				if(m.matches()){
-					System.out.print((DEBUG)?"match host\n":"");
-					temp = "host";
-				} else {
-					m = p.matcher(args[i]);
-					if(m.matches()){
-						System.out.print((DEBUG)?"match port\n":"");
-						temp = "port";
-					}
-				}
-
-				switch(temp){
-					case "host":
-						host = args[i];
-						break;
-					case "port":
-						try{
-							int tempInt = Integer.parseInt(args[i]);
-							if(tempInt > 1024 && tempInt < 65535){
-								port = tempInt;
-							} else {
-								port = DEFAULT_PORT;
-							}
-						} catch(NumberFormatException err){
-							System.err.println(err);
-							port = DEFAULT_PORT;
-						}
-						break;
-					default:
-						break;
-				}
-			}
-		}
-
-		System.out.print((DEBUG)?"host: "+host+"\n":"");
-		System.out.print((DEBUG)?"port: "+port+"\n":"");
-
-		// test parse
-		// if(DEBUG){
-		// 	parse("wordWallUpdate 0 1 2 word");
-		// 	parse("wordWallUpdate 0 e 2 word");	// err
-		// 	parse("wordWallUpdate 0 1 2");	// err
-		// 	parse("letterBankUpdate abcdefghijklmnopqrstuvwxyz");
-		// 	parse("letterBankUpdate ");	// err
-		// 	parse("letterBankUpdate");	// err
-		// 	parse("setPlayer A");
-		// 	parse("setPlayer 3");
-		// 	parse("setPlayer error");	// player set to 'e', the first char of the token
-		// 	parse("setPlayer");	// err
-		// 	parse("timeOut true");	// true
-		// 	parse("timeOut TRUE");	// true
-		// 	parse("timeOut TruE");	// true
-		// 	parse("timeOut truth");	// false
-		// 	parse("timeOut false");	// false
-		// 	parse("timeOut FALSE");	// false
-		// 	parse("setPowerup A 1");
-		// 	parse("setPowerup 1 A");	// err
-		// 	parse("setPowerup A");	// err
-		// 	parse("endGame 46 28");
-		// 	parse("endGame win loss");	// err
-		// 	parse("endGame 46");	// err
-		// 	parse("endGame");	// err
-		// 	parse(" ");	// err
-		// 	parse("");	// err
-		// }
-
-		// set up socket, output stream, input stream
-		System.out.print((DEBUG)?"connecting...":"");
-		try{
-			sock = new Socket(host, port);
-			output = new PrintWriter(sock.getOutputStream(), true);
-			input = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-			System.out.print((DEBUG)?"connected\n":"");
-		} catch(UnknownHostException err){
-			System.out.print((DEBUG)?"failed\n":"");
-			System.err.println(err);
-		} catch(IOException err){
-			System.out.print((DEBUG)?"failed\n":"");
-			System.err.println(err);
-		}
-
-		// connected to server, now listen for input
-		if(sock != null && output != null && input != null){
-			// create and run listening/parsing thread
-			listenThread lt = new listenThread(sock, output, input);
-			lt.start();
-
-			
-		}
-
-	}
 }
 
 // thread that listens for input from server
@@ -469,6 +372,8 @@ class listenThread extends Thread{
 						client.parse(temp);
 					}
 				}
+
+				// close socket and streams
 				input.close();
 				output.close();
 				sock.close();
