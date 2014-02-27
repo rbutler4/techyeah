@@ -4,11 +4,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
+import java.util.HashSet;
 
 
 public class SinglePlayerServer {
-	public HashMap dictionary;
+	public HashSet dictionary;
 	public String file = "2of4brif.txt";
 	
 	public static void main (String [] args){
@@ -23,7 +23,7 @@ public class SinglePlayerServer {
 	        BufferedReader buffRead = new BufferedReader (reader);
 	        totalCount = (int) Integer.parseInt(buffRead.readLine());
 	        for (int i =1; i< totalCount; i++) {
-				this.dictionary.put(buffRead.readLine(),new Object());
+				this.dictionary.add(buffRead.readLine());
 	        }
 		 } catch(FileNotFoundException e){
 	         e.printStackTrace();
@@ -33,7 +33,7 @@ public class SinglePlayerServer {
 	}
 	public SinglePlayerServer(){
 		super();
-		this.dictionary = new HashMap();
+		this.dictionary = new HashSet();
 	}
 }
 
