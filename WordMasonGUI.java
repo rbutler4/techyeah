@@ -51,6 +51,7 @@ public class WordMasonGUI extends javax.swing.JFrame {
     private String currBankLetters;
     private String nextBankLetters;
     private client CL;
+	private countdownThread CDT;
    
     /**
      * This method is called from within the constructor to initialize the form.
@@ -348,8 +349,28 @@ public class WordMasonGUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>                        
 
-   
-    
+	/**
+	 *	Name: resetGameBoard
+	 *	Description: clears the letter banks, word wall, scores, and input field
+	 */	
+    private void resetGameBoard() {
+		for (int i = 0; i < wallFields.length; i++) {
+            wallFields[i].setText("");
+        }
+		setPlayerOneScore(0);
+		setPlayerTwoScore(0);
+		wallHeight = 0;
+		inputField.setText("");
+		setBank("");
+		setNextBank("");
+	}
+
+	/**
+	 *	Name: startQuitButtonPressed
+ 	 *	Input: a JButton action event (button is clicked)
+	 *	Description: if button reads "start", connects client to game server and enables game. 
+	 *	If "quit", tells client to send server quit signal and disables game.
+	 */    
     private void startQuitButtonPressed(java.awt.event.ActionEvent evt) {                                        
         String buttonText = startQuitButton.getText();
         if (buttonText.equals("Start")) {
@@ -358,10 +379,17 @@ public class WordMasonGUI extends javax.swing.JFrame {
         } else {
             CL.update(4);
             toggleGameState(false);
+			resetGameBoard();
         }
     }                                       
 
-    public void submitWord(String word) {
+	/**
+	 *	Name: submitWord
+	 *	Input: a string representing a player-entered word
+	 *	Description: checks if word consists only of letters in the bank. If yes, passes the
+	 *		word to the client for submission. If no, notifies the player that word is invalid.
+	 */	
+    private void submitWord(String word) {
         currBankLetters = currBankLetters.toLowerCase();
         word = word.toLowerCase();
         char[] bankChars = currBankLetters.toCharArray();
@@ -388,28 +416,68 @@ public class WordMasonGUI extends javax.swing.JFrame {
         }
     }
     
+	/**
+	 *	Name: submitButtonPressed
+	 *	Input: a JButton action event (button is pressed)
+	 *	Description: calls submitWord with the current input string
+	 */
     private void submitButtonPressed(java.awt.event.ActionEvent evt) {                                     
         String word = inputField.getText();
         submitWord(word);
     }                                    
 
+	/**
+	 *	Name: setBank
+	 *	Input: the letters to be used in the bank
+	 *	Description: sets the current letter bank to the input string
+	 */	
     public void setBank(String letters) {
         currBankLetters = letters;
         currBankLabel.setText(currBankLetters);
     }
     
+	/**
+	 *	Name: setNextBank
+	 *	Input: the letters to be used in the next bank
+	 *	Description: sets the next letter bank to the input string
+	 */
     public void setNextBank(String letters) {
         nextBankLetters = letters;
+		nextBank.setText(letters);
+		//CDT.interrupt();
+		CDT = new countdownThread(20, this);
+		CDT.start();
     }
     
+	public void setNextBankTimer(int time) {
+		nextBankLabel.setText("Next bank in " + time + " seconds: ");
+	}
+	
+	/**
+	 *	Name: setPlayerOneScore
+	 *	Input: the score to be set
+	 *	Description: updates the player's score as represented in the GUI
+	 */
     public void setPlayerOneScore(int score) {
         playerOneScore.setText(Integer.toString(score));
     }
     
+	
+	/**
+	 *	Name: setPlayerTwoScore
+	 *	Input: the score to be set
+	 *	Description: updates the opponent's score as represented in the GUI
+	 */
     public void setPlayerTwoScore(int score) {
         playerTwoScore.setText(Integer.toString(score));
     }
     
+	/**
+	 *	Name: addWord
+	 *	Input: the word to be added
+	 *	Description: adds a word to the lowest unused level of the word wall, and removes
+	 *		the letters in that word from the current bank
+	 */
     public void addWord(String word) {
         wallFields[wallHeight].setText(word);
         wallHeight++;
@@ -432,17 +500,33 @@ public class WordMasonGUI extends javax.swing.JFrame {
         setBank(String.valueOf(bankChars));
     }
     
+	/**
+	 *	Name: timeOutDialog()
+	 *	Description: displays a dialog box that informs the user of a connection timeout
+	 */
     public void timeOutDialog() {
         JFrame frame = new JFrame();
         JOptionPane.showMessageDialog(frame, "Connection timed out.");
     }
     
+	/**
+	 *	Name: gameOverDialog()
+	 *	Description: displays a dialog box that informs the user of game end. Disables and
+	 *		resets the game board.
+	 */
     public void gameOverDialog() {
         JFrame frame = new JFrame();
         JOptionPane.showMessageDialog(frame, "Game over!");
         toggleGameState(false);
+		resetGameBoard();
     }
     
+	/**
+	 *	Name: toggleGameState
+	 *	Input: true for enable, false for disable
+	 *	Description: enables or disables the game board. Sets start/quit button text to
+	 *		"start" while disabled, "quit" while enabled.
+	 */
     private void toggleGameState(boolean toggle) {
         submitButton.setEnabled(toggle);
         inputField.setEnabled(toggle);
@@ -523,4 +607,25 @@ public class WordMasonGUI extends javax.swing.JFrame {
     private javax.swing.JTextField wallField8;
     private javax.swing.JTextField wallField9;
     // End of variables declaration                   
+}
+
+class countdownThread extends Thread {
+	int timer = 0;
+	WordMasonGUI parent;
+	
+	public countdownThread(int timer, WordMasonGUI parent){
+		this.timer = timer;
+		this.parent = parent;
+	}
+	
+	public void run() {
+		for(int i = timer; i >= 0; i--) {
+			parent.setNextBankTimer(i);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException err) {
+				break;
+			}			
+		}
+	}
 }
