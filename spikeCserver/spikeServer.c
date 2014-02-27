@@ -56,6 +56,7 @@ int main( int argc, char *argv[] )
         memset(buffer,0,256);
         memset(contentBuffer,0,255);
         /* If connection is established then start communicating */
+
         n = read( clisockfd,buffer,255 );
         if (n < 0)
         {
