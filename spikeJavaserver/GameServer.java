@@ -58,9 +58,9 @@ public class GameServer {
 						System.out.println(newMessage);
 						// Validate client message is a word.
 						if (dictionary.containsKey(newMessage))
-							sendMessage(newMessage + " ONE VALID",i);
+							sendMessage(newMessage + " ONE VALID\n",i);
 						else
-							sendMessage(newMessage + " ONE INVALID", i);
+							sendMessage(newMessage + " ONE INVALID\n", i);
 						byteNum1 = 0;
 					}
 					InputStream input2 = clientList.get(i).playerTwo.getInputStream();
@@ -75,9 +75,9 @@ public class GameServer {
 							newMessage = newMessage.substring(0,newMessage.length()-1);
 						System.out.println(newMessage);
 						if (dictionary.containsKey(newMessage))
-							sendMessage(newMessage + " TWO VALID",i);
+							sendMessage(newMessage + " TWO VALID\n",i);
 						else
-							sendMessage(newMessage + " TWO INVALID", i);
+							sendMessage(newMessage + " TWO INVALID\n", i);
 						byteNum2 = 0;
 					}
 				} 
