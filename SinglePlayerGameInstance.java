@@ -15,7 +15,7 @@ public class SinglePlayerGameInstance {
 	private static final int NUMBER_OF_SWAPS = 20;
 	public boolean exit = false;
 	public final HashSet dictionary;
-	public HashSet usedWords;
+	public HashSet usedWords = new HashSet();
 	public Socket player;
 	public InputStream fromPlayer;
 	public OutputStream toPlayer;
