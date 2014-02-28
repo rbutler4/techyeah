@@ -105,6 +105,7 @@ Section 2.2: letter bank update
 	Client								Server													Client
 									(start of game)
 	(accept letterBankUpdate)	<-	(method letterBankUpdate(1, <new letter bank>)	->	(accept letterBankUpdate)
+	(accept letterBankUpdate)	<-	(method letterBankUpdate(1, <new letter bank>)	->	(accept letterBankUpdate)
 	
 Section 2.3: word submission
 	Flow:
