@@ -82,8 +82,6 @@ public class SinglePlayerGameInstance {
 		if (firstWord.equalsIgnoreCase("word")){
 			String playerWord = st.nextToken();
 			if (isValid(playerWord)){
-				playerScore+=score(playerWord);
-				wallHeight ++;
 				// Check if repeated word
 				if (!usedWords.contains(playerWord)){
 					// Check if in letterbank
@@ -94,16 +92,14 @@ public class SinglePlayerGameInstance {
 							letterBankList.remove((Character)c);
 						// Add word to usedWords
 						usedWords.add(playerWord);
+					playerScore+=score(playerWord);
+					wallHeight ++;
+						
 					}
-					else{
-					}
-				}else{
-					
 				}
-				return "wordWallUpdate 0 "+ playerScore.toString() + " 0 " + playerWord +"\n";
-			}
-			
 				
+			}
+		return "wordWallUpdate 0 "+ playerScore.toString() + " 0 " + playerWord +"\n";
 		}
 		// Player has updated
 		if (firstWord.equalsIgnoreCase("update"))
