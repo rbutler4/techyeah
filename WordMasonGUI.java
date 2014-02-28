@@ -1,20 +1,34 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 
-//package wordmason;
+//package my.wordmason;
 
+//import my.wordmason.client;
 import javax.swing.*;
 import java.awt.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
  * @author Nik
  */
 public class WordMasonGUI extends javax.swing.JFrame {
-
+	
+	
+    private int wallHeight = 0;
+    private JTextField[] wallFields;
+    private String currBankLetters;
+    private String nextBankLetters;
+    private client CL;
+    private countdownThread CDT;
+    private static String hostname = "";
+    private static int port = -1;
+	
     /**
      * Creates new form NumberAdditionGUI
      */
@@ -42,16 +56,19 @@ public class WordMasonGUI extends javax.swing.JFrame {
         
         setBank("ABCDEFGHIJKLMNOPQRS");
         toggleGameState(false);
-        CL = new client();
+        if (port > 0 && !hostname.equals("")) {
+			CL = new client(hostname, port);
+		} else if (port > 0) {
+            CL = new client(port);
+        } else if (!hostname.equals("")) {
+			CL = new client(hostname);
+		} else {
+			CL = new client();
+		}
         CL.setGUI(this);    // lets client know to talk to this GUI
+        this.getRootPane().setDefaultButton(submitButton);
     }
-    
-    private int wallHeight = 0;
-    private JTextField[] wallFields;
-    private String currBankLetters;
-    private String nextBankLetters;
-    private client CL;
-	private countdownThread CDT;
+   
    
     /**
      * This method is called from within the constructor to initialize the form.
@@ -95,9 +112,9 @@ public class WordMasonGUI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        nextBankLabel.setText("Next bank in x seconds:");
+        nextBankLabel.setText("");
 
-        nextBank.setText("A B C D E F G H I J K L M N O P Q R S");
+        nextBank.setText("");
 
         playerTwoScoreLabel.setText("<html> Opponent <br> score </html>");
 
@@ -105,11 +122,11 @@ public class WordMasonGUI extends javax.swing.JFrame {
 
         playerTwoScore.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         playerTwoScore.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        playerTwoScore.setText("Y");
+        playerTwoScore.setText("0");
 
         playerOneScore.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         playerOneScore.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        playerOneScore.setText("X");
+        playerOneScore.setText("0");
 
         wallField16.setEditable(false);
         wallField16.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
@@ -192,7 +209,7 @@ public class WordMasonGUI extends javax.swing.JFrame {
         wallField1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         currBankLabel.setFont(new java.awt.Font("Verdana", 1, 13)); // NOI18N
-        currBankLabel.setText("A B C D E F G H I J K L M N O P Q R S");
+        currBankLabel.setText("");
         currBankLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -266,7 +283,7 @@ public class WordMasonGUI extends javax.swing.JFrame {
             }
         });
 
-        startQuitButton.setText("Start/Quit");
+        startQuitButton.setText("Start");
         startQuitButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 startQuitButtonPressed(evt);
@@ -361,8 +378,10 @@ public class WordMasonGUI extends javax.swing.JFrame {
 		setPlayerTwoScore(0);
 		wallHeight = 0;
 		inputField.setText("");
-		setBank("");
-		setNextBank("");
+		currBankLabel.setText("");
+		nextBank.setText("");
+		nextBankLabel.setText("");
+		CDT.interrupt();
 	}
 
 	/**
@@ -409,7 +428,7 @@ public class WordMasonGUI extends javax.swing.JFrame {
         }
         
         if (lettersUsed != word.length()) {
-            inputField.setText("Invalid");
+            inputField.setText("");
         } else {
             CL.word(word);
             //addWord(word);
@@ -569,6 +588,21 @@ public class WordMasonGUI extends javax.swing.JFrame {
         }
         //</editor-fold>
 
+        //Set host/port variables
+        int numArgs = args.length;
+        if (numArgs > 0) {
+            Pattern p = Pattern.compile("\\d*");	// any number of digits
+            Matcher m;
+            for(int i = 0; i < args.length; i++) {
+                m = p.matcher(args[i]);
+                if (m.matches()) {
+                    port = Integer.parseInt(args[i]);
+                } else {
+                    hostname = args[i];
+                }
+            }
+        }
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
