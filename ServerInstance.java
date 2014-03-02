@@ -184,7 +184,7 @@ public class ServerInstance {
 	
 	/**
 	*	Determines score for a valid, submitted word. Score is determined
-	*	by word length and is quadradic. For example, if a word is three 
+	*	by word length and is quadratic. For example, if a word is three 
 	*	letters long, score will be 9 (= 3 * 3).
 	*
 	*	@param playerWord	a player's inputed word
@@ -265,7 +265,7 @@ public class ServerInstance {
 	}
 	
 	/**
-	*	Swaps letters in word bank to separate vowels and consonants(?)
+	*	Swaps letters in word bank to display characters in more appealing fashion.
 	*
 	*	@param original a string that represents a newly generated letter bank
 	*	@return String(result) a string that represents a newly generated letter 
