@@ -5,9 +5,9 @@
  * and open the template in the editor.
  */
 
-//package my.wordmason;
+//package wordmason;
 
-//import my.wordmason.client;
+//import wordmason.client;
 import javax.swing.*;
 import java.awt.*;
 import java.util.regex.Matcher;
@@ -54,7 +54,7 @@ public class WordMasonGUI extends javax.swing.JFrame {
         wallFields[14] = wallField15;
         wallFields[15] = wallField16;
         
-        setBank("ABCDEFGHIJKLMNOPQRS");
+     
         toggleGameState(false);
         if (port > 0 && !hostname.equals("")) {
 			CL = new client(hostname, port);
@@ -359,7 +359,7 @@ public class WordMasonGUI extends javax.swing.JFrame {
                             .addComponent(submitButton)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(3, 3, 3)
-                                .addComponent(inputField, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(inputField, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap())
         );
 
@@ -409,8 +409,8 @@ public class WordMasonGUI extends javax.swing.JFrame {
 	 *		word to the client for submission. If no, notifies the player that word is invalid.
 	 */	
     private void submitWord(String word) {
-        currBankLetters = currBankLetters.toLowerCase();
-        word = word.toLowerCase();
+        currBankLetters = currBankLetters.toUpperCase();
+        word = word.toUpperCase();
         char[] bankChars = currBankLetters.toCharArray();
         char[] wordChars = word.toCharArray();
         int lettersUsed = 0;
@@ -427,12 +427,12 @@ public class WordMasonGUI extends javax.swing.JFrame {
             }
         }
         
-        if (lettersUsed != word.length()) {
-            inputField.setText("");
-        } else {
+        if (lettersUsed == word.length()) {
             CL.word(word);
-            //addWord(word);
-        }
+        } 
+		inputField.setText("");
+        //addWord(word);
+      
     }
     
 	/**
@@ -451,7 +451,7 @@ public class WordMasonGUI extends javax.swing.JFrame {
 	 *	Description: sets the current letter bank to the input string
 	 */	
     public void setBank(String letters) {
-        currBankLetters = letters;
+        currBankLetters = letters.toUpperCase();
         currBankLabel.setText(currBankLetters);
     }
     
@@ -461,7 +461,7 @@ public class WordMasonGUI extends javax.swing.JFrame {
 	 *	Description: sets the next letter bank to the input string
 	 */
     public void setNextBank(String letters) {
-        nextBankLetters = letters;
+        nextBankLetters = letters.toUpperCase();
 		nextBank.setText(letters);
 		//CDT.interrupt();
 		CDT = new countdownThread(20, this);
@@ -501,8 +501,8 @@ public class WordMasonGUI extends javax.swing.JFrame {
         wallFields[wallHeight].setText(word);
         wallHeight++;
         
-        currBankLetters = currBankLetters.toLowerCase();
-        word = word.toLowerCase();
+        currBankLetters = currBankLetters.toUpperCase();
+        word = word.toUpperCase();
         char[] bankChars = currBankLetters.toCharArray();
         char[] wordChars = word.toCharArray();
         for (int i = 0; i < bankChars.length; i++) {
