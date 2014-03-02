@@ -11,7 +11,7 @@ import java.util.StringTokenizer;
 
 // Individual games are handled as threads by the server.
 public class ServerInstance {
-	private static final Integer MAX_WALL_HEIGHT = 9;
+	private static final Integer MAX_WALL_HEIGHT = 15;
 	private static final int NUMBER_OF_SWAPS = 20;
 	public boolean exit = false;
 	public final HashSet dictionary;
@@ -23,6 +23,7 @@ public class ServerInstance {
 	public long timeStamp1, timeStamp2;
 	public String letterBankString;
 	public List<Character> letterBankList = new ArrayList<Character>();
+	public List<Character> nextletterBankList = new ArrayList<Character>();
 	public char [] playerWordChars;
 	public String gameMessage;
 	public Integer playerScore = 0;
@@ -36,13 +37,31 @@ public class ServerInstance {
 	}
 
 	public void run(){
-		//sendMessage("Connected to server\n");
-		
+		// set player
+		sendMessage("setPlayer "+'A'+"\n");
+
+		//send letter bank update (cur bank) for start of game
+		letterBankString = getLetterBank();
+		letterBankList = getLetterList(letterBankString);
+		sendMessage("letterBankUpdate " + letterBankString);
+
 		while (!exit){
 			timeStamp1 = timeStamp2 = System.currentTimeMillis();
-			letterBankString = getLetterBank();
-			letterBankList = getLetterList(letterBankString);
-			sendMessage("letterBankUpdate " + letterBankString);
+
+			// if start of game
+			if(nextletterBankList.isEmpty()){
+				// send another letterbank update (becomes nextbank)
+				letterBankString = getLetterBank();
+				nextletterBankList = getLetterList(letterBankString);
+				sendMessage("letterBankUpdate " + letterBankString);
+			} else {
+				// copy nextletterbanklist to letterbanklist
+				letterBankList = new ArrayList(nextletterBankList);
+				// generate new bank, set as next bank, and send to clients
+				letterBankString = getLetterBank();
+				nextletterBankList = getLetterList(letterBankString);
+				sendMessage("letterBankUpdate " + letterBankString);
+			}
 			while (timeStamp2 - timeStamp1 < 20000 && !exit){
 				try{
 					Thread.sleep(10);
@@ -52,10 +71,13 @@ public class ServerInstance {
 					while(byteNum >0){
 						fromPlayer.read(receivedByte);
 						gameMessage = updateStatus(new String(receivedByte));
-						sendMessage(gameMessage);
+						// checks if valid msg to send
+						if(gameMessage != null){
+							sendMessage(gameMessage);
+						}
 						byteNum = 0;
 					}
-					if (wallHeight >=ServerInstance.MAX_WALL_HEIGHT){
+					if (wallHeight.compareTo(MAX_WALL_HEIGHT) > 0){
 						sendMessage("endGame "+playerScore.toString()+" 0\n");
 						exit = true;
 					}
@@ -88,21 +110,31 @@ public class ServerInstance {
 	*/
 
 	public String updateStatus (String playerInput){
+		// validate input
+		if(playerInput == null || playerInput.equals("")){
+			return null;
+		}
+
 		StringTokenizer st = new StringTokenizer(playerInput);
 		String firstWord = st.nextToken();
 		// Player has input a word
 		//equalsIgnoreCase determines whether two string objects contain
 		//the same data, ignoring the case of letters in the String
 		if (firstWord.equalsIgnoreCase("word")){
+			// checks if user sent a word to check
+			if(!st.hasMoreTokens()){
+				return null;
+			}
 			String playerWord = st.nextToken();
 			System.out.println("Player submitted: " + playerWord);
 			if (isValid(playerWord)){
 				System.out.println("Word is valid");
 				// Check if repeated word
+				System.out.println(usedWords);
 				if (!usedWords.contains(playerWord)){
 					// Check if in letterbank
 					if (CheckLetterList(playerWord, (ArrayList<Character>) letterBankList)){
-						System.out.println("Word uses leters from letter bank");
+						System.out.println("Word uses letters from letter bank");
 						// Remove letters from bank
 						System.out.println("Removing letters from letter bank");
 						playerWordChars = playerWord.toCharArray();
@@ -110,27 +142,29 @@ public class ServerInstance {
 							letterBankList.remove((Character)c);
 						// Add word to usedWords
 						usedWords.add(playerWord);
-					playerScore+=score(playerWord);
-					System.out.println("Player score: " + playerScore);
-					wallHeight ++;
-					System.out.println("Wall height: " + wallHeight);
-
-						
+						playerScore+=score(playerWord);
+						System.out.println("Player score: " + playerScore);
+						wallHeight++;
+						System.out.println("Wall height: " + wallHeight);
+						//WallUpdate (int, int, int, string): Wall flag, scoreA, scoreB, word
+						//Wall flags: 0 -> no powerup, 1 -> wreching  ball, 2 -> chisel, 3 -> thief
+						System.out.println("updateStatus method returning: " + "wordWallUpdate 0 "+ playerScore.toString() + " 0 " + playerWord +"\n");
+						return "wordWallUpdate 0 "+ playerScore.toString() + " 0 " + playerWord +"\n";
 					}
 				}
-				
 			}
-		//WallUpdate (int, int, int, string): Wall flag, scoreA, scoreB, word
-		//Wall flags: 0 -> no powerup, 1 -> wreching  ball, 2 -> chisel, 3 -> thief
-		System.out.println("updateStatus method returning: " + "wordWallUpdate 0 "+ playerScore.toString() + " 0 " + playerWord +"\n");
-		return "wordWallUpdate 0 "+ playerScore.toString() + " 0 " + playerWord +"\n";
 		}
 		// Player has update
 		//equalsIgnoreCase determines whether two string objects contain
 		//the same data, ignoring the case of letters in the String
-		if (firstWord.equalsIgnoreCase("update"))
-			if (Integer.parseInt(st.nextToken()) == (Integer) 4)
-			return "quit";
+		else if (firstWord.equalsIgnoreCase("update")){
+			if (Integer.parseInt(st.nextToken()) == (Integer) 4){
+				exit = true;
+				return "endGame "+playerScore.toString()+" 0\n";
+			}
+		}
+
+		// else invalid input
 		return null;
 	}
 	
