@@ -67,8 +67,8 @@ class ListenerThread extends Thread {
 		launcher.populate();
 		try {
 			System.out.println("Running thread...creating game");
-			server = new ServerSocket(8128);
-			System.out.println("Server listening on port 8128");
+			server = new ServerSocket(5000);
+			System.out.println("Server listening on port 5000");
 			while(true){
 				Thread.sleep(50);
 				newGameSocket = server.accept();
