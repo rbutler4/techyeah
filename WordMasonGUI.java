@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 public class WordMasonGUI extends javax.swing.JFrame {
 	
 	
-    private int wallHeight = 0;
+    private int wallHeight;
     private JTextField[] wallFields;
     private String currBankLetters;
     private String nextBankLetters;
@@ -28,6 +28,9 @@ public class WordMasonGUI extends javax.swing.JFrame {
     private countdownThread CDT;
     private static String hostname = "";
     private static int port = -1;
+	private int[] wordOwnership;
+	private Color PLAYER_COLOR = new Color(67, 127, 146);
+	private Color OPPONENT_COLOR = new Color(200, 0, 0);
 	
     /**
      * Creates new form NumberAdditionGUI
@@ -54,6 +57,7 @@ public class WordMasonGUI extends javax.swing.JFrame {
         wallFields[14] = wallField15;
         wallFields[15] = wallField16;
         
+		wordOwnership = new int[16];
      
         toggleGameState(false);
         if (port > 0 && !hostname.equals("")) {
@@ -492,6 +496,10 @@ public class WordMasonGUI extends javax.swing.JFrame {
         playerTwoScore.setText(Integer.toString(score));
     }
     
+	public void setOwner(int owner) {
+		wordOwnership[wallHeight] = owner;
+	}
+	
 	/**
 	 *	Name: addWord
 	 *	Input: the word to be added
@@ -499,9 +507,16 @@ public class WordMasonGUI extends javax.swing.JFrame {
 	 *		the letters in that word from the current bank
 	 */
     public void addWord(String word) {
-        wallFields[wallHeight].setText(word);
+		JTextField currLevel = wallFields[wallHeight];
+        currLevel.setText(word);
+		if (wordOwnership[wallHeight] == 0) {
+			currLevel.setForeground(PLAYER_COLOR);
+		} else {
+			currLevel.setForeground(OPPONENT_COLOR);
+		}
         wallHeight++;
         
+		//remove this word's letters from the bank
         currBankLetters = currBankLetters.toUpperCase();
         word = word.toUpperCase();
         char[] bankChars = currBankLetters.toCharArray();

@@ -151,9 +151,7 @@ public class ServerInstance {
 						System.out.println("updateStatus method returning: " + "wordWallUpdate 0 "+ playerScore.toString() + " 0 " + playerWord +"\n");
 						return "wordWallUpdate 0 "+ playerScore.toString() + " 0 " + playerWord +"\n";
 					}
-					System.out.println("Letters not in bank.");	
 				}
-				System.out.println("Word is invalid.");
 			}
 		}
 		// Player has update

@@ -28,6 +28,8 @@ public class client{
 	private static WordMasonGUI GUI = null;
 	private static char player = 'x';
 	private static String nextBank = null;
+	private static int playerScoreA;
+	private static int playerScoreB;
 
 	// CONSTRUCTOR
 	// name:   client
@@ -182,6 +184,23 @@ public class client{
 						switch(flag){
 							// add word
 							case 0:
+								//player A added a word to the wall
+								if(playerScoreA < scoreA) {
+									if(player == 'A') {
+										GUI.setOwner(0);
+									} else {
+										GUI.setOwner(1);
+									}
+									playerScoreA = scoreA;
+								//player B added a word to the wall
+								} else if (playerScoreB < scoreB) {
+									if(player == 'B') {
+										GUI.setOwner(0);
+									} else {
+										GUI.setOwner(1);
+									}
+									playerScoreB = scoreB;
+								}
 								GUI.addWord(str);
 								if(player == 'A'){
 									GUI.setPlayerOneScore(scoreA);
