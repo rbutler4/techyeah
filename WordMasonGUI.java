@@ -428,6 +428,7 @@ public class WordMasonGUI extends javax.swing.JFrame {
         }
         
         if (lettersUsed == word.length()) {
+			word = word.toLowerCase();
             CL.word(word);
         } 
 		inputField.setText("");
