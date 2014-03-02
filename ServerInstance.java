@@ -128,7 +128,7 @@ public class ServerInstance {
 			String playerWord = st.nextToken();
 			System.out.println("Player submitted: " + playerWord);
 			if (isValid(playerWord)){
-				System.out.println("Word is valid");
+				System.out.println("Word is in dictionary");
 				// Check if repeated word
 				System.out.println(usedWords);
 				if (!usedWords.contains(playerWord)){
