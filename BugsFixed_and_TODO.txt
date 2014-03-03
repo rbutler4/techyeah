@@ -7,10 +7,11 @@ ServerInstance.java
 -updateStatus quit:  fixed the if branch that deals with player quiting
 -updateStatus accepting any word:  checks if word is valid, uses valid letters, and has not been used.
 -sendMessage:  checked if string is not null before sending
+GUI:
+-clear input box:  if a valid word is submitted, it is not cleared from the input box.
+-input box height:  too short, cuts off g, y, j, etc.
 
 
 To Fix:
 GUI:
 -window size:  auto window width too small on Nels' machine.
--clear input box:  if a valid word is submitted, it is not cleared from the input box.
--input box height:  too short, cuts off g, y, j, etc.
