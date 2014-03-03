@@ -39,7 +39,7 @@ public class WordMasonServer {
 	private static final int DEFAULT_PORT = 5000;
 	private static int port;
 
-	public static void main(String[] args) throws Exception {
+	public synchronized void main(String[] args) throws Exception {
 		// TODO: parse input so a diffrent port can be used from cmd line
 
 		port = DEFAULT_PORT;
@@ -63,6 +63,7 @@ public class WordMasonServer {
 
 				playerOne.start();
 				playerTwo.start();
+				game.run(playerOne, playerTwo);
 			}
 		} finally {
 			listener.close();
