@@ -44,7 +44,7 @@ public class WordMasonServer {
 	private static int port;
 
 	public static void main(String[] args) throws Exception {
-		// TODO: parse input so a diffrent port can be used from cmd line
+		//parse input so a diffrent port can be used from cmd line
 		if(args.length > 0){
 			port = Integer.parseInt(args[0]);
 
@@ -109,7 +109,7 @@ class Game {
 	// description:  initalizes game
 	public Game(){
 		super();
-		// TODO: initalize dictionary, see Server.java
+		// initalize dictionary, see Server.java
 		dictionary = new HashSet();
 		int totalCount;
 		try{
@@ -331,6 +331,7 @@ class Game {
 	public synchronized void parse(String msg, Player player, Player opponent){
 		System.out.print((DEBUG)?"parse msg: "+msg+" player: "+player.player+" opponent: "+opponent.player+"\n":"");
 		int flag;
+		String msgWord;
 		String str;
 		
 		// TODO: parse player input similar to client.parse()
@@ -340,47 +341,82 @@ class Game {
 
 		if(0<tokens.length){
 			str = tokens[0];
+			System.out.print((DEBUG)?"first msg token: "+str+"\n":"");
 
 			switch(str){
-				// wordWallUpdate (int wallFlag, int scoreA, int scoreB, string word)
+				// update
 				case "update":
 					if(2==tokens.length){
-						flag = tokens[1].charAt(0);
+						try{
+							flag = Integer.parseInt(tokens[1]);
+						} catch(NumberFormatException err){
+							System.err.println(err);
+							break;
+						}
+						System.out.print((DEBUG)?"update(" + flag + ")\n":"");
+						switch(flag){
+							//wrecking ball
+							case 1:
+								// remove last two words from wall
+								// be sure to remove from player's and opponent's own walls
+								// send wordWallUpdate for wrecking ball
+								System.out.print((DEBUG)?"wordWallUpdate(" + flag + " " + scoreA + " " + scoreB + " " + player.player + " " + opponent.player + "\n":"");
+								send("wordWallUpdate "+ flag + " " + scoreA + " " + scoreB + "\n", player, opponent);
+
+								break;
+							//chisel
+							case 2:
+								// ??
+								// send wordWallUpdate for chisel
+								System.out.print((DEBUG)?"wordWallUpdate(" + flag + " " + scoreA + " " + scoreB + " " + player.player + " " + opponent.player + "\n":"");
+								send("wordWallUpdate "+ flag + " " + scoreA + " " + scoreB + "\n", player, opponent);
+
+								break;
+							//thief
+							case 3:
+								// find opponent's last word
+								// remove from opponent's wall
+								// add to player's wall
+								// remove word's points from opponent
+								// give half points to player
+								// send wordWallUpdate for theif
+								System.out.print((DEBUG)?"wordWallUpdate(" + flag + " " + scoreA + " " + scoreB + " " + player.player + " " + opponent.player + "\n":"");
+								send("wordWallUpdate "+ flag + " " + scoreA + " " + scoreB + "\n", player, opponent);
+
+								break;
+							//quit
+							case 4:
+								exit = true;
+								// send endGame
+								send("endGame "+scoreA+" "+scoreB+"\n", player, opponent);
+								break;
+						}
 					} else {
 						System.out.print((DEBUG)?"invalid update\n":"");
 					}
 					break;
+				//word
 				case "word":
+					if(2==tokens.length){
+						msgWord = tokens[1];
+						System.out.print((DEBUG)?"word(" + msgWord + ")\n":"");
+						//if word is valid
+						if(isValid(msgWord)){
+							// update wall
+							// update player's own wall
+							// update player score
+							// send wordWallUpdate for word
+
+							// if received powerup
+								// send setPowerup to player
+						}
+
+					} else {
+						System.out.print((DEBUG)?"invalid word sent from client\n":"");
+					}
 					break;
 			}
 		}
-		// update
-			// 1  wrecking ball
-				// remove last two words from wall
-				// be sure to remove from player's and opponent's own walls
-				// send wordWallUpdate for wrecking ball
-			// 2  chisel
-				// ??
-				// send wordWallUpdate for chisel
-			// 3  thief
-				// find opponent's last word
-				// remove from opponent's wall
-				// add to player's wall
-				// remove word's points from opponent
-				// give half points to player
-				// send wordWallUpdate for theif
-			// 4  quit
-				// exit = true;
-				// send endGame
-		// word
-			// if word is valid
-				// update wall
-				// update player's own wall
-				// update player score
-				// send wordWallUpdate for word
-
-				// if received powerup
-					// send setPowerup to player
 	}
 
 	// name:   send
@@ -457,6 +493,8 @@ class Game {
 					// parse input
 					if(temp != null){
 						parse(temp, this, opponent);
+						System.out.print((DEBUG)?"input detected\n":"");
+
 					}
 				}
 
