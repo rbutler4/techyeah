@@ -18,16 +18,20 @@
 
 // import statements alphabetically here
 // try to import specifically what is needed and avoid using .*
+import java.util.ArrayList;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.HashSet;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
+
 
 /**
 *  WordMasonServer
@@ -39,10 +43,14 @@ public class WordMasonServer {
 	private static final int DEFAULT_PORT = 5000;
 	private static int port;
 
-	public synchronized void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
 		// TODO: parse input so a diffrent port can be used from cmd line
+		if(args.length > 0){
+			port = Integer.parseInt(args[0]);
 
-		port = DEFAULT_PORT;
+		}else{
+			port = DEFAULT_PORT;
+		}
 		ServerSocket listener = new ServerSocket(port);
 		System.out.print((DEBUG)?"WordMasonServer listening on port: "+port+"\n":"");
 
@@ -78,9 +86,11 @@ public class WordMasonServer {
 class Game {
 	// set DEBUG to false to turn off debug info for Game
 	private static final Boolean DEBUG = true;
-	private static final Integer MAX_WALL_HEIGHT = 15;
-	private static final int NUMBER_OF_SWAPS = 20;  // used in David's swapLetters method
 	private static boolean exit = false;	// false if game is being played
+	private static final Integer MAX_WALL_HEIGHT = 15;
+	private static HashSet dictionary;
+	private static HashSet usedWords;
+	private static final int NUMBER_OF_SWAPS = 20;  // used in David's swapLetters method
 	private static int scoreA;
 	private static int scoreB;
 	private static Integer wallHeight = 0;
@@ -90,6 +100,7 @@ class Game {
 	private static Stack wall = new Stack();  // stack of the current word wall
 	private static String letterBankString;
 	private static Random generator = new Random(System.currentTimeMillis());
+	private static String file = "2of4brif.txt";
 
 	// CONSTRUCTOR
 	// name:   Game
@@ -97,7 +108,24 @@ class Game {
 	// output: [none]
 	// description:  initalizes game
 	public Game(){
+		super();
 		// TODO: initalize dictionary, see Server.java
+		dictionary = new HashSet();
+		int totalCount;
+		try{
+	        FileReader reader = new FileReader(file);
+	        BufferedReader buffRead = new BufferedReader (reader);
+	        totalCount = (int) Integer.parseInt(buffRead.readLine());
+	        for (int i =1; i< totalCount; i++) {
+				dictionary.add(buffRead.readLine());
+	        }
+
+	        System.out.print((DEBUG)?"dictionary has been populated\n":"");
+		 } catch(FileNotFoundException e){
+	         e.printStackTrace();
+	     } catch (IOException e) {
+	         e.printStackTrace();
+	     }
 	}
 
 	// name:   run
@@ -262,16 +290,26 @@ class Game {
 	public synchronized boolean isValid(String word){
 		System.out.print((DEBUG)?"isValid: "+word+"\n":"");
 
-		// TODO check if word is in dictionary
-		if(true){
+		//check if word is in dictionary
+		word = word.toLowerCase();
+		if (dictionary.contains(word)){
 			System.out.print((DEBUG)?word+" is in dictionary\n":"");
 			
-			// TODO check if word has been used
-			if(true){
+			//check if word has been used
+			if(!(usedWords.contains(word))){
 				System.out.print((DEBUG)?word+" has not been used\n":"");
 
-				// TODO check if word uses letters from current letter bank
-				if(true){
+				//check if word uses letters from current letter bank
+				char [] wordCharsArray = word.toCharArray();
+				boolean isInLetterBank = true; 
+				for (char c : wordCharsArray){
+					isInLetterBank = letterBankList.remove((Character)c); //returns true if inBankList contains the specified char
+					if (!isInLetterBank){
+						isInLetterBank = false;
+					}
+				}
+
+				if(isInLetterBank){
 					System.out.print((DEBUG)?word+" is valid\n":"");
 					return true;
 				}
@@ -292,11 +330,27 @@ class Game {
 	// comments:  synchronized so with threads it is "First come First serve" to maintain concurrency
 	public synchronized void parse(String msg, Player player, Player opponent){
 		System.out.print((DEBUG)?"parse msg: "+msg+" player: "+player.player+" opponent: "+opponent.player+"\n":"");
-
+		int flag;
+		
 		// TODO: parse player input similar to client.parse()
 		// see devUseCases for Client-to-Server "methods" it needs to handle
 		// see devUseCases for Server-to-Client "methods" it needs to send
+		String[] tokens = msg.split("[ ]+");
 
+		if(0<tokens.length){
+			str = tokens[0];
+
+			switch(str){
+				// wordWallUpdate (int wallFlag, int scoreA, int scoreB, string word)
+				case "update":
+					if(2==tokens.length){
+						flag = tokens[1].charAt(0);
+					} else {
+						System.out.print((DEBUG)?"invalid update\n":"");
+					}
+					break;
+				case "word"
+					break;
 		// update
 			// 1  wrecking ball
 				// remove last two words from wall
