@@ -331,6 +331,7 @@ class Game {
 	public synchronized void parse(String msg, Player player, Player opponent){
 		System.out.print((DEBUG)?"parse msg: "+msg+" player: "+player.player+" opponent: "+opponent.player+"\n":"");
 		int flag;
+		String str;
 		
 		// TODO: parse player input similar to client.parse()
 		// see devUseCases for Client-to-Server "methods" it needs to handle
@@ -349,8 +350,10 @@ class Game {
 						System.out.print((DEBUG)?"invalid update\n":"");
 					}
 					break;
-				case "word"
+				case "word":
 					break;
+			}
+		}
 		// update
 			// 1  wrecking ball
 				// remove last two words from wall
