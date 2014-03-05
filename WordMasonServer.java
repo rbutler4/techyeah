@@ -18,7 +18,6 @@
 
 // import statements alphabetically here
 // try to import specifically what is needed and avoid using .*
-import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -28,6 +27,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
@@ -111,6 +111,7 @@ class Game {
 		super();
 		// initalize dictionary, see Server.java
 		dictionary = new HashSet();
+		usedWords = new HashSet();
 		int totalCount;
 		try{
 	        FileReader reader = new FileReader(file);
@@ -133,7 +134,7 @@ class Game {
 	// output: [none]
 	// description:  the main loop of the game, sends letterBank updates, checks if won/quit
 	// comments:  partially David's code
-	public synchronized void run(Player player, Player opponent){
+	public static void run(Player player, Player opponent){
 		//send letter bank update (cur bank) for start of game
 		letterBankString = getLetterBank();
 		letterBankList = getLetterList(letterBankString);
@@ -184,7 +185,7 @@ class Game {
 	// output: String
 	// description:  generates a new letter bank
 	// comments:  David's code
-	public synchronized String getLetterBank(){
+	public static String getLetterBank(){
 		String newBank = "";
 		String alphabet = "abcdefghijklmnopqrstuvwxyz";
 		char newLetter;
@@ -243,7 +244,7 @@ class Game {
 			vowels.remove(randomlySelected);
 			newBank += newLetter;
 		}
-		System.out.println("New letter bank: " + swapLetters(newBank));
+		// System.out.println("New letter bank: " + swapLetters(newBank));
 		return swapLetters(newBank) +"\n";
 	}
 
@@ -252,7 +253,7 @@ class Game {
 	// output: String
 	// description:  used in getLetterBank
 	// comments:  David's code
-	public synchronized String swapLetters (String original){
+	public static String swapLetters (String original){
 		char [] result = original.toCharArray();
 		int sLength = original.length();
 		char toBeReplaced;
@@ -274,7 +275,7 @@ class Game {
 	// output: ArrayList<Character>
 	// description:  Converts a string to an array list
 	// comments:  David's code
-	public synchronized ArrayList<Character> getLetterList (String bankString){
+	public static ArrayList<Character> getLetterList (String bankString){
 		ArrayList<Character> bankList = new ArrayList<Character>();
 		char [] bankChars = bankString.toCharArray();
 		for (char c : bankChars)
@@ -287,7 +288,7 @@ class Game {
 	// output: boolean
 	// description:  returns true if String is a valid word else false
 	// comments:  synchronized so with threads it is "First come First serve" to maintain concurrency
-	public synchronized boolean isValid(String word){
+	public static boolean isValid(String word){
 		System.out.print((DEBUG)?"isValid: "+word+"\n":"");
 
 		//check if word is in dictionary
@@ -328,7 +329,7 @@ class Game {
 	// output: [none]
 	// description:  parse player input and if valid sends msg to clients
 	// comments:  synchronized so with threads it is "First come First serve" to maintain concurrency
-	public synchronized void parse(String msg, Player player, Player opponent){
+	public static void parse(String msg, Player player, Player opponent){
 		System.out.print((DEBUG)?"parse msg: "+msg+" player: "+player.player+" opponent: "+opponent.player+"\n":"");
 		int flag;
 		String msgWord;
@@ -424,7 +425,8 @@ class Game {
 	// output: [none]
 	// description:  sends String to one client
 	// comments:  synchronized so with threads it is "First come First serve" to maintain concurrency
-	public synchronized void send(String msg, Player player){
+	public static void send(String msg, Player player){
+		System.out.print((DEBUG)?"player "+player.player+" sending: "+msg+"\n":"");
 		player.output.println(msg);
 		System.out.print((DEBUG)?"player "+player.player+" sent: "+msg+"\n":"");
 	}
@@ -434,7 +436,7 @@ class Game {
 	// output: [none]
 	// description:  sends String to two clients
 	// comments:  synchronized so with threads it is "First come First serve" to maintain concurrency
-	public synchronized void send(String msg, Player player, Player opponent){
+	public static void send(String msg, Player player, Player opponent){
 		player.output.println(msg);
 		opponent.output.println(msg);
 		System.out.print((DEBUG)?"players: "+player.player+" "+opponent.player+" sent: "+msg+"\n":"");
@@ -480,23 +482,31 @@ class Game {
 		// runs this thread
 		// this thread started only if two players connected
 		public void run(){
+			System.out.print((DEBUG)?"thread "+player+" started\n":"");
 			try {
+				System.out.print((DEBUG)?"thread "+player+" trying\n":"");
 				// game going to start
-				send("timeOut FALSE", this);
+				
+				// System.out.print((DEBUG)?"thread "+player+" sending timeOut\n":"");
+				// send("timeOut FALSE", this);
+				// System.out.print((DEBUG)?"thread "+player+" sent timeOut\n":"");
 
-				String temp;
+				// String temp;
 				// while game is going and player connected
 				while(!exit && socket.isConnected() && !socket.isClosed()){
 					// listen for input
-					temp = input.readLine();
+					String temp = input.readLine();
+					System.out.print((DEBUG)?"thread "+player+" received "+temp+"\n":"");
 
 					// parse input
 					if(temp != null){
-						parse(temp, this, opponent);
 						System.out.print((DEBUG)?"input detected\n":"");
+						parse(temp, this, opponent);
 
 					}
 				}
+
+				System.out.print((DEBUG)?"thread "+player+" exiting\n":"");
 
 				// close socket and streams
 				input.close();
