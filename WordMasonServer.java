@@ -318,6 +318,9 @@ class Game {
 				if(isInLetterBank){
 					System.out.print((DEBUG)?word+" is valid\n":"");
 					usedWords.add(word);
+					System.out.print((DEBUG)?word+" added to wall\n":"");
+					wallHeight++;
+					System.out.print((DEBUG)?"wall height: " + wallHeight+"\n":"");
 					return true;
 				}
 				System.out.print((DEBUG)?"invalid: "+word+" uses letters not in letter bank\n":"");
