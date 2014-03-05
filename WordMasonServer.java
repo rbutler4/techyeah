@@ -21,13 +21,13 @@
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.HashSet;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
@@ -88,8 +88,10 @@ class Game {
 	private static final Boolean DEBUG = true;
 	private static boolean exit = false;	// false if game is being played
 	private static final Integer MAX_WALL_HEIGHT = 15;
-	private static HashSet dictionary;
-	private static HashSet usedWords;
+	private static HashSet<String> dictionary;
+	private static ArrayList<String> usedWords;
+	private static ArrayList<String> playerWords;
+	private static ArrayList<String> opponentWords;
 	private static final int NUMBER_OF_SWAPS = 20;  // used in David's swapLetters method
 	private static int scoreA;
 	private static int scoreB;
@@ -110,8 +112,11 @@ class Game {
 	public Game(){
 		super();
 		// initalize dictionary, see Server.java
-		dictionary = new HashSet();
-		usedWords = new HashSet();
+		dictionary = new HashSet<String>();
+		usedWords = new ArrayList<String>();
+		playerWords = new ArrayList<String>();
+		opponentWords = new ArrayList<String>();
+
 		int totalCount;
 		try{
 	        FileReader reader = new FileReader(file);
@@ -312,6 +317,7 @@ class Game {
 
 				if(isInLetterBank){
 					System.out.print((DEBUG)?word+" is valid\n":"");
+					usedWords.add(word);
 					return true;
 				}
 				System.out.print((DEBUG)?"invalid: "+word+" uses letters not in letter bank\n":"");
@@ -335,7 +341,7 @@ class Game {
 		String msgWord;
 		String str;
 		
-		// TODO: parse player input similar to client.parse()
+		// parse player input similar to client.parse()
 		// see devUseCases for Client-to-Server "methods" it needs to handle
 		// see devUseCases for Server-to-Client "methods" it needs to send
 		String[] tokens = msg.split("[ ]+");
@@ -358,36 +364,89 @@ class Game {
 						switch(flag){
 							//wrecking ball
 							case 1:
+
+								System.out.print((DEBUG)?"flag: "+flag+" wrecking ball\n":"");
+
+								String topWordFromWall=null;
+								String nextTopWordFromWall=null;
+								String temp=null;
+
 								// remove last two words from wall
+								if(usedWords.size() > 1){
+									topWordFromWall = usedWords.get(usedWords.size()-1);
+									System.out.print((DEBUG)?"removing: "+topWordFromWall+" from wall\n":"");
+									usedWords.remove(usedWords.size()-1);
+									if(usedWords.size() > 1){
+										nextTopWordFromWall = usedWords.get(usedWords.size()-1);
+										System.out.print((DEBUG)?"removing: "+nextTopWordFromWall+" from wall\n":"");
+										usedWords.remove(usedWords.size()-1);
+									}
+								}
+
 								// be sure to remove from player's and opponent's own walls
+								if(topWordFromWall != null){
+									//check topmost word in player's word wall and topmost word in shared wall
+									temp = playerWords.get(playerWords.size()-1);
+									if(topWordFromWall == temp){
+										System.out.print((DEBUG)?"removing: "+temp+" from player wall\n":"");
+										playerWords.remove(playerWords.size()-1);
+									}
+									//check topmost word in opponent's word wall and topmost word in shared wall
+									temp = opponentWords.get(opponentWords.size()-1);
+									if(topWordFromWall == temp){
+										System.out.print((DEBUG)?"removing: "+temp+" from opponent wall\n":"");
+										opponentWords.remove(opponentWords.size()-1);
+									}
+									if(nextTopWordFromWall != null){
+										//check topmost word (next topmost word if top was removed in previous if statement) in player's wall and next topmost word in shared word wall
+										temp = playerWords.get(playerWords.size()-1);
+										if(nextTopWordFromWall == temp){
+											System.out.print((DEBUG)?"removing: "+temp+" from player wall\n":"");
+											playerWords.remove(playerWords.size()-1);
+										}
+										//check topmost word (next topmost word if top was removed in previous if statement) in opponent's wall and next topmost word in shared word wall
+										temp = opponentWords.get(opponentWords.size()-1);
+										if(nextTopWordFromWall == temp){
+											System.out.print((DEBUG)?"removing: "+temp+" from opponent wall\n":"");
+											opponentWords.remove(opponentWords.size()-1);
+										}
+									}
+								}
+	
 								// send wordWallUpdate for wrecking ball
 								System.out.print((DEBUG)?"wordWallUpdate(" + flag + " " + scoreA + " " + scoreB + " " + player.player + " " + opponent.player + "\n":"");
 								send("wordWallUpdate "+ flag + " " + scoreA + " " + scoreB + "\n", player, opponent);
-
 								break;
 							//chisel
 							case 2:
 								// ??
 								// send wordWallUpdate for chisel
+							    System.out.print((DEBUG)?"flag: "+flag+" chisel\n":"");
 								System.out.print((DEBUG)?"wordWallUpdate(" + flag + " " + scoreA + " " + scoreB + " " + player.player + " " + opponent.player + "\n":"");
 								send("wordWallUpdate "+ flag + " " + scoreA + " " + scoreB + "\n", player, opponent);
-
 								break;
 							//thief
 							case 3:
+								System.out.print((DEBUG)?"flag: "+flag+" thief\n":"");
 								// find opponent's last word
+								String lastWordOpp = opponentWords.get(opponentWords.size()-1);
 								// remove from opponent's wall
+								opponentWords.remove(opponentWords.size()-1);
 								// add to player's wall
+								playerWords.add(lastWordOpp);
 								// remove word's points from opponent
+								int points = lastWordOpp.length() * lastWordOpp.length();
+								scoreB -= points;
 								// give half points to player
+								scoreA += points / 2; 
 								// send wordWallUpdate for theif
 								System.out.print((DEBUG)?"wordWallUpdate(" + flag + " " + scoreA + " " + scoreB + " " + player.player + " " + opponent.player + "\n":"");
 								send("wordWallUpdate "+ flag + " " + scoreA + " " + scoreB + "\n", player, opponent);
-
 								break;
 							//quit
 							case 4:
 								exit = true;
+								System.out.print((DEBUG)?"endGame(" + scoreA + " " + scoreB + " " + player.player + " " + opponent.player + "\n":"");
 								// send endGame
 								send("endGame "+scoreA+" "+scoreB+"\n", player, opponent);
 								break;
@@ -404,12 +463,21 @@ class Game {
 						//if word is valid
 						if(isValid(msgWord)){
 							// update wall
+							usedWords.add(msgWord);
 							// update player's own wall
+							playerWords.add(msgWord);
 							// update player score
+							scoreB += msgWord.length()*msgWord.length();
 							// send wordWallUpdate for word
+							send("wordWallUpdate 0 " + scoreA + " " + scoreB + " " + msgWord + "\n", player, opponent);
 
 							// if received powerup
+							int powerUpFlag = (int) Math.random()*3;//generates random number [0,3]
+							if(powerUpFlag > 0){
 								// send setPowerup to player
+								send("setPowerup " + powerUpFlag + "\n", player);
+							}
+							
 						}
 
 					} else {
