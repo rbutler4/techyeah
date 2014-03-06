@@ -366,22 +366,31 @@ class Game {
 							case 1:
 
 								System.out.print((DEBUG)?"flag: "+flag+" wrecking ball\n":"");
+								System.out.print((DEBUG)?"wall height: "+wallHeight+"\n":"");
+								System.out.print((DEBUG)?"player " + player.player + " wall height: " + player.wall.size() + "\n":"");
+								System.out.print((DEBUG)?"player " + opponent.player + " wall height: " + opponent.wall.size() + "\n":"");
 
 								String topWordFromWall=null;
 								String nextTopWordFromWall=null;
 								String temp=null;
 
 								// remove last two words from wall
-								if(usedWords.size() > 1){
+								if(usedWords.size() > 0){
 									topWordFromWall = usedWords.get(usedWords.size()-1);
 									System.out.print((DEBUG)?"removing: "+topWordFromWall+" from wall\n":"");
 									usedWords.remove(usedWords.size()-1);
-									if(usedWords.size() > 1){
-										nextTopWordFromWall = usedWords.get(usedWords.size()-1);
-										System.out.print((DEBUG)?"removing: "+nextTopWordFromWall+" from wall\n":"");
-										usedWords.remove(usedWords.size()-1);
-									}
+									wallHeight--;
 								}
+
+								if(usedWords.size() > 0){
+									nextTopWordFromWall = usedWords.get(usedWords.size()-1);
+									System.out.print((DEBUG)?"removing: "+nextTopWordFromWall+" from wall\n":"");
+									usedWords.remove(usedWords.size()-1);
+									wallHeight--;
+								}
+
+								System.out.print((DEBUG)?"top word in word wall: "+topWordFromWall+"\n":"");
+								System.out.print((DEBUG)?"next top word in word wall: "+nextTopWordFromWall+"\n":"");
 
 								// be sure to remove from player's and opponent's own walls
 								if(topWordFromWall != null){
@@ -389,14 +398,14 @@ class Game {
 									if(player.wall.size()>0){
 										temp = player.wall.get(player.wall.size()-1);
 										if(topWordFromWall == temp){
-											System.out.print((DEBUG)?"removing: "+temp+" from player wall\n":"");
+											System.out.print((DEBUG)?"removing: "+temp+" from player " + player.player + " wall\n":"");
 											player.wall.remove(player.wall.size()-1);
 										}
 										if(nextTopWordFromWall != null && player.wall.size() > 0){
 											//check topmost word (next topmost word if top was removed in previous if statement) in player's wall and next topmost word in shared word wall
 											temp = player.wall.get(player.wall.size()-1);
 											if(nextTopWordFromWall == temp && temp != null){
-												System.out.print((DEBUG)?"removing: "+temp+" from player wall\n":"");
+												System.out.print((DEBUG)?"removing: "+temp+" from player " + player.player + " wall\n":"");
 												player.wall.remove(player.wall.size()-1);
 											}
 										}
@@ -407,20 +416,25 @@ class Game {
 									if(opponent.wall.size() > 0){
 										temp = opponent.wall.get(opponent.wall.size()-1);
 										if(topWordFromWall == temp){
-											System.out.print((DEBUG)?"removing: "+temp+" from opponent wall\n":"");
+											System.out.print((DEBUG)?"removing: "+temp+" from player " + opponent.player + " (opponent) wall\n":"");
 											opponent.wall.remove(opponent.wall.size()-1);
 										}
 										if(nextTopWordFromWall != null && opponent.wall.size() > 0){
 											//check topmost word (next topmost word if top was removed in previous if statement) in opponent's wall and next topmost word in shared word wall
 											temp = opponent.wall.get(opponent.wall.size()-1);
 											if(nextTopWordFromWall == temp && temp != null){
-												System.out.print((DEBUG)?"removing: "+temp+" from opponent wall\n":"");
+												System.out.print((DEBUG)?"removing: "+temp+" from player " + opponent.player + " (opponent) wall\n":"");
 												opponent.wall.remove(opponent.wall.size()-1);
 											}
 										}
 									}
 								}
 								
+								System.out.print((DEBUG)?"wall height: "+wallHeight+"\n":"");
+								System.out.print((DEBUG)?"player " + player.player + " wall height: " + player.wall.size() + "\n":"");
+								System.out.print((DEBUG)?"player " + opponent.player + " wall height: " + opponent.wall.size() + "\n":"");
+
+
 								String msgTemp = "wordWallUpdate "+ flag + " " + scoreA + " " + scoreB + " \n";
 								String[] tokensTemp = msgTemp.split("[ ]+");
 								System.out.print((DEBUG)?"msg to client token length: " + tokensTemp.length + "\n":"");
@@ -430,21 +444,24 @@ class Game {
 								break;
 							//chisel
 							case 2:
-								// ??
-								// send wordWallUpdate for chisel
-								if(player.player == 'A'){
+							    System.out.print((DEBUG)?"flag: "+flag+" chisel\n":"");
+								// player gets points for opponent's word
+								if(player.player == 'A' && opponent.wall.size() > 0){
 									int pnts = opponent.wall.get(opponent.wall.size()-1).length();
 									pnts = pnts*pnts;
 									scoreA += pnts;
 									scoreB -= pnts;
-								}else{
-									int pnts = player.wall.get(player.wall.size()-1).length();
+									System.out.print((DEBUG)?"player A gets " + pnts + " points and player B loses " + pnts + " points for player B's word " + opponent.wall.get(opponent.wall.size()-1) + "\n":"");
+								}else if (player.player == 'B' && opponent.wall.size() > 0){
+									int pnts = opponent.wall.get(opponent.wall.size()-1).length();
 									pnts = pnts*pnts;
 									scoreB += pnts;
 									scoreA -= pnts;
-
+									System.out.print((DEBUG)?"player B gets " + pnts + "points and player A loses " + pnts + " points for player A's word " + opponent.wall.get(opponent.wall.size()-1) + "\n":"");
+								}else{
+									System.out.print((DEBUG)?"player " + opponent.player + " does not have any words to chisel\n":"");
 								}
-							    System.out.print((DEBUG)?"flag: "+flag+" chisel\n":"");
+							    // send wordWallUpdate for chisel
 								System.out.print((DEBUG)?"wordWallUpdate(" + flag + " " + scoreA + " " + scoreB + ") " + player.player + " " + opponent.player + "\n":"");
 								send("wordWallUpdate "+ flag + " " + scoreA + " " + scoreB + ") \n", player, opponent);
 								break;
@@ -463,14 +480,20 @@ class Game {
 									// remove word's points from opponent
 									int points = lastWordOpp.length() * lastWordOpp.length();
 									if(player.player == 'A'){
+										System.out.print((DEBUG)?"player " + player.player + " has "+ scoreA + "points, player " + opponent.player + " has " + scoreB + " points\n":"");
 										scoreB -= points;
 										// give half points to player
-										scoreA += points / 2; 
+										scoreA += (points / 2); 
 										System.out.print((DEBUG)?"player " + player.player + " gets " + points/2 + " points from player " + opponent.player + "\n":"");
+										System.out.print((DEBUG)?"player " + opponent.player + " loses " + points + "\n":"");
+										System.out.print((DEBUG)?"player " + player.player + " has " + scoreA + " points, player " + opponent.player + " has " + scoreB + " points\n":"");
 									}else{
+										System.out.print((DEBUG)?"player B has " + scoreB + " points, player A has " + scoreA + " points\n":"");
 										scoreA -= points;
-										scoreB += points / 2;
-										System.out.print((DEBUG)?"player " + opponent.player + " gets " + points/2 + " points from player " + player.player + "\n":"");
+										scoreB += (points / 2);
+										System.out.print((DEBUG)?"player " + player.player + " gets " + points/2 + " points from player " + opponent.player + "\n":"");
+										System.out.print((DEBUG)?"player " + opponent.player + " loses " + points + "\n":"");
+										System.out.print((DEBUG)?"player A has " + scoreA + " points, player B has " + scoreB + " points\n":"");
 									}
 								}else{
 									System.out.print((DEBUG)?"player " + opponent.player + " does not have any words to chisel\n":"");
@@ -505,10 +528,12 @@ class Game {
 							if(player.player == 'A'){
 								// update player's own wall
 								player.wall.add(msgWord);
+								System.out.print((DEBUG)?msgWord + " added to player " + player.player + " wall\n":"");
 								// update player score
 								scoreA += msgWord.length()*msgWord.length();
 							}else{
 								player.wall.add(msgWord);
+								System.out.print((DEBUG)?msgWord + " added to player " + player.player + " wall\n":"");
 								// update player score
 								scoreB += msgWord.length()*msgWord.length();
 							}
