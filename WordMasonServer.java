@@ -449,15 +449,19 @@ class Game {
 								if(player.player == 'A' && opponent.wall.size() > 0){
 									int pnts = opponent.wall.get(opponent.wall.size()-1).length();
 									pnts = pnts*pnts;
-									scoreA += pnts;
+									//scoreA += pnts;
 									scoreB -= pnts;
-									System.out.print((DEBUG)?"player A gets " + pnts + " points and player B loses " + pnts + " points for player B's word " + opponent.wall.get(opponent.wall.size()-1) + "\n":"");
+									//System.out.print((DEBUG)?"player A gets " + pnts + " points and player B loses " + pnts + " points for player B's word " + opponent.wall.get(opponent.wall.size()-1) + "\n":"");
+									System.out.print((DEBUG)?"player " + opponent.player + " loses " + pnts + " points for player " + opponent.player + " word " + opponent.wall.get(opponent.wall.size()-1) + "\n":"");
+
 								}else if (player.player == 'B' && opponent.wall.size() > 0){
 									int pnts = opponent.wall.get(opponent.wall.size()-1).length();
 									pnts = pnts*pnts;
-									scoreB += pnts;
+									//scoreB += pnts;
 									scoreA -= pnts;
-									System.out.print((DEBUG)?"player B gets " + pnts + "points and player A loses " + pnts + " points for player A's word " + opponent.wall.get(opponent.wall.size()-1) + "\n":"");
+									//System.out.print((DEBUG)?"player B gets " + pnts + "points and player A loses " + pnts + " points for player A's word " + opponent.wall.get(opponent.wall.size()-1) + "\n":"");
+									System.out.print((DEBUG)?"player " + opponent.player + " loses " + pnts + " points for player " + opponent.player + " word " + opponent.wall.get(opponent.wall.size()-1) + "\n":"");
+
 								}else{
 									System.out.print((DEBUG)?"player " + opponent.player + " does not have any words to chisel\n":"");
 								}
