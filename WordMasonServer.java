@@ -467,17 +467,31 @@ class Game {
 						if(isValid(msgWord)){
 							// update wall
 							usedWords.add(msgWord);
-							// update player's own wall
-							playerWords.add(msgWord);
-							// update player score
-							scoreB += msgWord.length()*msgWord.length();
+							
+
+							if(player.player == 'A'){
+								// update player's own wall
+								playerWords.add(msgWord);
+								// update player score
+								scoreA += msgWord.length()*msgWord.length();
+							}else{
+								opponentWords.add(msgWord);
+								// update player score
+								scoreB += msgWord.length()*msgWord.length();
+							}
+							
+							
+							
 							// send wordWallUpdate for word
-							send("wordWallUpdate 0 " + scoreA + " " + scoreB + " " + msgWord + "\n", player, opponent);
+							send("wordWallUpdate 0 " + scoreB + " " + scoreA + " " + msgWord + "\n", player);
+							send("wordWallUpdate 0 " + scoreA + " " + scoreB + " " + msgWord + "\n", opponent);
 
 							// if received powerup
 							int powerUpFlag = (int) Math.random()*3;//generates random number [0,3]
+							System.out.print((DEBUG)?"powerUpFlag: " + powerUpFlag + "\n":"");
 							if(powerUpFlag > 0){
 								// send setPowerup to player
+								System.out.print((DEBUG)?"setPowerup(" + powerUpFlag + ", player " + player.player+ ")\n":"");
 								send("setPowerup " + powerUpFlag + "\n", player);
 							}
 							
