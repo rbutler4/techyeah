@@ -611,6 +611,7 @@ class Game {
 			try {
 				input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				output = new PrintWriter(socket.getOutputStream(), true);
+				send("setPlayer "+player+"\n", this);
 			} catch (IOException e) {
 				System.out.print((DEBUG)?"player "+this.player+" died\n":"");
 				System.err.println(e);
