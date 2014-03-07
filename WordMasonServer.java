@@ -190,7 +190,7 @@ class Game {
 	// comments:  David's code
 	public static String getLetterBank(){
 		String newBank = "";
-		String alphabet = "abcdefghijklmnopqrstuvwxyz";
+		String alphabet = "abcdefghilmnoprstuwy";
 		char newLetter;
 		int randomlySelected = 0;
 		ArrayList<Character> vowels = new ArrayList<Character>();
