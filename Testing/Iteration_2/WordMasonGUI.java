@@ -390,7 +390,13 @@ public class WordMasonGUI extends javax.swing.JFrame {
 	 *	Description: if button reads "start", connects client to game server and enables game. 
 	 *	If "quit", tells client to send server quit signal and disables game.
 	 */    
-    private void startQuitButtonPressed(java.awt.event.ActionEvent evt) {                                        
+    private void startQuitButtonPressed(java.awt.event.ActionEvent evt) { 
+    
+    	//TESTING PURPOSES--start the timer-- in nanoseconds
+ 			//may want to use System.currentTimeMillis() --appears it might work a little faster
+ 			long startTime = System.nanoTime();
+ 			//////////////////////////////////
+ 			                                       
         String buttonText = startQuitButton.getText();
         if (buttonText.equals("Start")) {
             CL.connect();
@@ -400,6 +406,15 @@ public class WordMasonGUI extends javax.swing.JFrame {
             toggleGameState(false);
 			resetGameBoard();
         }
+        
+        //TESTING PURPOSES--stop the timer-- print duration	
+        	long endTime = System.nanoTime();
+        	long duration = endTime - startTime;
+        	//System.out.println("nanoseconds: "+duration);
+        	//convert to milliseconds 
+ 			double duration_in_milliseconds= (double)duration/1000000.0;
+ 			System.out.println("Time taken let players know game is over(milliseconds): "+duration_in_milliseconds);
+         	//////////////////////////////////
     }                                       
 
 	/**
@@ -442,9 +457,26 @@ public class WordMasonGUI extends javax.swing.JFrame {
 	 *	Description: calls submitWord with the current input string
 	 */
     private void submitButtonPressed(java.awt.event.ActionEvent evt) {                                     
-        String word = inputField.getText();
-        submitWord(word);
-    }                                    
+        
+        
+
+        	//TESTING PURPOSES--start the timer-- in nanoseconds
+ 			//may want to use System.currentTimeMillis() --appears it might work a little faster
+ 			long startTime = System.nanoTime();
+ 			//////////////////////////////////
+        
+        	String word = inputField.getText();
+        	submitWord(word);
+        
+       	 	//TESTING PURPOSES--stop the timer-- print duration	
+        	long endTime = System.nanoTime();
+        	long duration = endTime - startTime;
+        	//System.out.println("nanoseconds: "+duration);
+        	//convert to milliseconds 
+ 			double duration_in_milliseconds= (double)duration/1000000.0;
+ 			System.out.println("Time taken to update word wall once user submits word (milliseconds): "+duration_in_milliseconds);
+         	//////////////////////////////////
+	}                      
 
 	/**
 	 *	Name: setBank
