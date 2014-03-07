@@ -10,6 +10,7 @@
 //import wordmason.client;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,7 +18,7 @@ import java.util.regex.Pattern;
  *
  * @author Nik
  */
-public class WordMasonGUI extends javax.swing.JFrame {
+public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 	
 	
     private int wallHeight;
@@ -31,6 +32,8 @@ public class WordMasonGUI extends javax.swing.JFrame {
 	private int[] wordOwnership;
 	private Color PLAYER_COLOR = new Color(67, 127, 146);
 	private Color OPPONENT_COLOR = new Color(200, 0, 0);
+	private Color NEUTRAL_COLOR = new Color(105, 105, 105);
+	private int playerOnePowerup;
 	
     /**
      * Creates new form NumberAdditionGUI
@@ -71,6 +74,9 @@ public class WordMasonGUI extends javax.swing.JFrame {
 		}
         CL.setGUI(this);    // lets client know to talk to this GUI
         this.getRootPane().setDefaultButton(submitButton);
+		inputField.addKeyListener(this);
+		startQuitButton.addKeyListener(this);
+		submitButton.addKeyListener(this);
     }
    
    
@@ -496,6 +502,14 @@ public class WordMasonGUI extends javax.swing.JFrame {
         playerTwoScore.setText(Integer.toString(score));
     }
     
+	public void setPlayerOnePowerup(int powerup) {
+		playerOnePowerup = powerup;
+		System.out.println("Powerup: " + powerup);
+	}
+	
+	public void setPlayerTwoPowerup(int powerup) {
+	}
+	
 	public void setOwner(int owner) {
 		wordOwnership[wallHeight] = owner;
 	}
@@ -574,8 +588,69 @@ public class WordMasonGUI extends javax.swing.JFrame {
         } else {
             startQuitButton.setText("Start");
         }
-        
+        System.out.println("Hi");
     }
+	
+	public void powerupUsed(int powerup, int user) {
+		switch (powerup) {
+			case 1:
+				wreckingBall();
+			case 2:
+				chisel(user);
+			case 3:
+				thief(user);
+		}
+	}
+	
+	//clears the top two wallFields and updates wallHeight 
+	private void wreckingBall() {
+		for (int i = 2; i > 0; i--) {
+			wallFields[wallHeight].setText("");
+			wallHeight--;
+		}
+	}
+	
+	//changes the most recent word by the specified user's opponent to the neutral color
+	private void chisel(int user) {
+		//iterate through ownership array most -> least recent, identifying first word
+		//owned by powerup user's opponent
+		for (int i = wallHeight - 1; i > 0; i--) {
+			if (wordOwnership[i] != user) {
+				wallFields[i].setForeground(NEUTRAL_COLOR);
+			}
+		}
+	}
+	
+	//changes the most recent word by the specified user's opponent to the user's color
+	private void thief(int user) {
+		Color newColor;
+		if (user == 0) {
+			newColor = PLAYER_COLOR;
+		} else {
+			newColor = OPPONENT_COLOR;
+		}
+		//iterate through ownership array most -> least recent, identifying first word
+		//owned by powerup user's opponent
+		for (int i = wallHeight - 1; i > 0; i--) {
+			if (wordOwnership[i] != user) {
+				wallFields[i].setForeground(newColor);
+			}
+		}
+	}
+	
+	public void keyPressed(KeyEvent e) {
+		
+	}
+	
+	public void keyTyped(KeyEvent e) {
+	}
+	
+	public void keyReleased(KeyEvent e) {
+		
+		if (e.getKeyChar() == '1') {
+			CL.update(playerOnePowerup);
+		}
+	}
     
     /**
      * @param args the command line arguments
@@ -679,3 +754,21 @@ class countdownThread extends Thread {
 		}
 	}
 }
+/*
+class powerupListener implements KeyListener {
+	
+	client CL;
+	
+	public void KeyPressed(KeyEvent e) {
+		if (e.getKeyChar() == '1') {
+			CL.update(4);
+		}
+	}
+	
+	public void KeyTyped(KeyEvent e) {
+	}
+	
+	public void KeyReleased(KeyEvent e) {
+	}
+}
+*/

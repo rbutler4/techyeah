@@ -212,9 +212,23 @@ public class client{
 								break;
 							// use powerup
 							default:
-								// GUI.powerupUsed(flag);
-								// GUI.setPlayerOneScore(scoreA);
-								// GUI.setPlayerTwoScore(scoreB);
+								int user; 
+								if (playerScoreA > scoreA && player == 'A') {
+									user = 1;
+								} else if (playerScoreB > scoreB && player == 'B') {
+									user = 1;
+								} else {
+									user = 0;
+								}	
+								
+								GUI.powerupUsed(flag, user);
+								if (player == 'A') {
+									GUI.setPlayerOneScore(scoreA);
+									GUI.setPlayerTwoScore(scoreB);
+								} else {
+									GUI.setPlayerOneScore(scoreB);
+									GUI.setPlayerTwoScore(scoreA);
+								}
 								break;
 						}
 					} else {
@@ -275,13 +289,13 @@ public class client{
 						}
 						System.out.print((DEBUG)?"setPowerup("+play+", "+flag+")\n":"");
 						if(play == 'A' && player == 'A'){
-							// GUI.setPlayerOnePowerup(flag);
+							 GUI.setPlayerOnePowerup(flag);
 						} else if(play == 'A'){ // && player B
-							// GUI.setPlayerTwoPowerup(flag);
+							 GUI.setPlayerTwoPowerup(flag);
 						} else if(play == 'B' && player == 'A'){
-							// GUI.setPlayerTwoPowerup(flag);
+							 GUI.setPlayerTwoPowerup(flag);
 						} else {	// play B && player B
-							// GUI.setPlayerOnePowerup(flag);
+							 GUI.setPlayerOnePowerup(flag);
 						}
 					} else {
 						System.out.print((DEBUG)?"invalid setPowerup\n":"");
