@@ -237,7 +237,7 @@ class Game {
 			newBank += newLetter;
 		}
 		for (int i = 0; i < 7; i++){
-			randomlySelected = generator.nextInt(26);
+			randomlySelected = generator.nextInt(alphabet.length());
 			newLetter = alphabet.charAt(randomlySelected);
 			newBank += newLetter;
 		}
