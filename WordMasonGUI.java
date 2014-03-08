@@ -556,6 +556,8 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
     public void timeOutDialog() {
         JFrame frame = new JFrame();
         JOptionPane.showMessageDialog(frame, "Connection timed out.");
+        toggleGameState(false);
+        resetGameBoard();
     }
     
 	/**

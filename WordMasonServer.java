@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -41,13 +42,13 @@ public class WordMasonServer {
 	// set DEBUG to false to turn off debug info for WordMasonServer
 	private static final Boolean DEBUG = true;
 	private static final int DEFAULT_PORT = 5000;
+	private static final int TIMEOUT = 2000;	// 2 seconds for testing
 	private static int port;
 
 	public static void main(String[] args) throws Exception {
 		//parse input so a diffrent port can be used from cmd line
 		if(args.length > 0){
 			port = Integer.parseInt(args[0]);
-
 		}else{
 			port = DEFAULT_PORT;
 		}
@@ -57,21 +58,36 @@ public class WordMasonServer {
 		try {
 			while(true){
 				// create a new game, set players in it, and start it
-				// Not sure if this will timeout
 				Game game = new Game();
 
 				Game.Player playerOne = game.new Player(listener.accept(), 'A');
 				System.out.print((DEBUG)?"player one connected\n":"");
 
-				Game.Player playerTwo = game.new Player(listener.accept(), 'B');
-				System.out.print((DEBUG)?"player two connected\n":"");
+				// this try lets players timeout without crashing the server
+				try {
+					// set timeout for another player to join
+					listener.setSoTimeout(TIMEOUT);
 
-				playerOne.setOpponent(playerTwo);
-				playerTwo.setOpponent(playerOne);
+					Game.Player playerTwo = game.new Player(listener.accept(), 'B');
 
-				playerOne.start();
-				playerTwo.start();
-				game.run(playerOne, playerTwo);
+					// another player has joined, so cancel timeout
+					listener.setSoTimeout(0);
+
+					System.out.print((DEBUG)?"player two connected\n":"");
+
+					playerOne.setOpponent(playerTwo);
+					playerTwo.setOpponent(playerOne);
+
+					playerOne.start();
+					playerTwo.start();
+					game.run(playerOne, playerTwo);
+				} catch (SocketTimeoutException e){
+					System.out.print((DEBUG)?"timeout\n":"");
+					listener.setSoTimeout(0);
+
+					// reap playerOne
+					game.send("timeOut true\n", playerOne);
+				}
 			}
 		} finally {
 			listener.close();
@@ -86,7 +102,7 @@ public class WordMasonServer {
 class Game {
 	// set DEBUG to false to turn off debug info for Game
 	private static final Boolean DEBUG = true;
-	private static boolean exit = false;	// false if game is being played
+	public static boolean exit = false;	// false if game is being played
 	private static final Integer MAX_WALL_HEIGHT = 15;
 	private static HashSet<String> dictionary;
 	private static ArrayList<String> usedWords;
@@ -600,6 +616,15 @@ class Game {
 
 		// THREAD CONSTRUCTOR
 		// name:   Player
+		// input:  [none]
+		// output: [none]
+		// description:  initalizes this player
+		public Player(){
+			player = 'X';
+		}
+
+		// THREAD CONSTRUCTOR
+		// name:   Player
 		// input:  Socket, char
 		// output: [none]
 		// description:  initalizes this player
@@ -632,14 +657,8 @@ class Game {
 		public void run(){
 			System.out.print((DEBUG)?"thread "+player+" started\n":"");
 			try {
-				System.out.print((DEBUG)?"thread "+player+" trying\n":"");
-				// game going to start
-				
-				// System.out.print((DEBUG)?"thread "+player+" sending timeOut\n":"");
-				// send("timeOut FALSE", this);
-				// System.out.print((DEBUG)?"thread "+player+" sent timeOut\n":"");
+				// System.out.print((DEBUG)?"thread "+player+" trying\n":"");
 
-				// String temp;
 				// while game is going and player connected
 				while(!exit && socket.isConnected() && !socket.isClosed()){
 					// listen for input
