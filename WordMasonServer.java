@@ -456,7 +456,7 @@ class Game {
 								System.out.print((DEBUG)?"msg to client token length: " + tokensTemp.length + "\n":"");
 								// send wordWallUpdate for wrecking ball
 								System.out.print((DEBUG)?"wordWallUpdate(" + flag + " " + scoreA + " " + scoreB + ") " + player.player + " " + opponent.player + "\n":"");
-								send("wordWallUpdate "+ flag + " " + scoreA + " " + scoreB + " \n", player, opponent);
+								send("wordWallUpdate "+ flag + " " + scoreA + " " + scoreB + " placeholder \n", player, opponent);
 								break;
 							//chisel
 							case 2:
@@ -483,7 +483,7 @@ class Game {
 								}
 							    // send wordWallUpdate for chisel
 								System.out.print((DEBUG)?"wordWallUpdate(" + flag + " " + scoreA + " " + scoreB + ") " + player.player + " " + opponent.player + "\n":"");
-								send("wordWallUpdate "+ flag + " " + scoreA + " " + scoreB + ") \n", player, opponent);
+								send("wordWallUpdate "+ flag + " " + scoreA + " " + scoreB + " placeholder", player, opponent);
 								break;
 							//thief
 							case 3:
@@ -520,7 +520,7 @@ class Game {
 								}
 								// send wordWallUpdate for theif
 								System.out.print((DEBUG)?"wordWallUpdate(" + flag + " " + scoreA + " " + scoreB + ") " + player.player + " " + opponent.player + "\n":"");
-								send("wordWallUpdate "+ flag + " " + scoreA + " " + scoreB + "\n", player, opponent);
+								send("wordWallUpdate "+ flag + " " + scoreA + " " + scoreB + " placeholder \n", player, opponent);
 								break;
 							//quit
 							case 4:

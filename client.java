@@ -166,7 +166,7 @@ public class client{
 
 		if(0<tokens.length){
 			str = tokens[0];
-
+			System.out.println((DEBUG)?"Number of tokens: "+tokens.length+"\n":"");
 			switch(str){
 				// wordWallUpdate (int wallFlag, int scoreA, int scoreB, string word)
 				case "wordWallUpdate":
@@ -222,6 +222,7 @@ public class client{
 								}	
 								
 								GUI.powerupUsed(flag, user);
+								System.out.println((DEBUG)?"Powerup used: " + player + ", " + flag:"");
 								if (player == 'A') {
 									GUI.setPlayerOneScore(scoreA);
 									GUI.setPlayerTwoScore(scoreB);
@@ -288,14 +289,10 @@ public class client{
 							break;
 						}
 						System.out.print((DEBUG)?"setPowerup("+play+", "+flag+")\n":"");
-						if(play == 'A' && player == 'A'){
+						if(play == player){
 							 GUI.setPlayerOnePowerup(flag);
-						} else if(play == 'A'){ // && player B
-							 GUI.setPlayerTwoPowerup(flag);
-						} else if(play == 'B' && player == 'A'){
-							 GUI.setPlayerTwoPowerup(flag);
 						} else {	// play B && player B
-							 GUI.setPlayerOnePowerup(flag);
+							 GUI.setPlayerTwoPowerup(flag);
 						}
 					} else {
 						System.out.print((DEBUG)?"invalid setPowerup\n":"");

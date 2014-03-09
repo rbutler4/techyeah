@@ -77,6 +77,9 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 		inputField.addKeyListener(this);
 		startQuitButton.addKeyListener(this);
 		submitButton.addKeyListener(this);
+		
+		this.setSize(new Dimension(350, 600));
+		this.setResizable(false);
     }
    
    
@@ -129,7 +132,7 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 
         nextBank.setText("");
 
-        playerTwoScoreLabel.setText("<html> Opponent <br> score </html>");
+        playerTwoScoreLabel.setText("<html> Opponent's <br> score </html>");
 
         playerOneScoreLabel.setText("<html> Your <br> score </html>");
 
@@ -302,6 +305,13 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
                 startQuitButtonPressed(evt);
             }
         });
+		
+		/*
+		inputField.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				inputFieldAltered(evt);
+			}
+		});*/
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -335,6 +345,8 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(startQuitButton)
                                 .addGap(81, 81, 81)
+								.addComponent(invalidLabel)
+								.addGap(20, 20, 20)
                                 .addComponent(inputField, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(submitButton)))
@@ -374,6 +386,8 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(submitButton)
+							.addComponent(invalidLabel)
+							.addGap(5, 5, 5)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(3, 3, 3)
                                 .addComponent(inputField, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))))
@@ -417,8 +431,14 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
             toggleGameState(false);
 			resetGameBoard();
         }
-    }                                       
+    }
 
+	/*
+	private void inputFieldAltered(java.awt.event.ActionEvent evt) {
+		invalidLabel.setText("");
+	}
+	*/
+	
 	/**
 	 *	Name: submitWord
 	 *	Input: a string representing a player-entered word
@@ -431,6 +451,9 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
         char[] bankChars = currBankLetters.toCharArray();
         char[] wordChars = word.toCharArray();
         int lettersUsed = 0;
+		
+		invalidLabel.setText("");
+		
         for (int i = 0; i < bankChars.length; i++) {
             char bankLetter = bankChars[i];
             for(int j = 0; j < word.length(); j++) {
@@ -447,12 +470,19 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
         if (lettersUsed == word.length()) {
 			word = word.toLowerCase();
             CL.word(word);
-        } 
+        } else {
+			invalid();
+		}
 		inputField.setText("");
+
         //addWord(word);
       
     }
     
+	private void invalid() {
+		invalidLabel.setText("Invalid");
+	}
+	
 	/**
 	 *	Name: submitButtonPressed
 	 *	Input: a JButton action event (button is pressed)
@@ -480,7 +510,7 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 	 */
     public void setNextBank(String letters) {
         nextBankLetters = letters.toUpperCase();
-		nextBank.setText(letters);
+		nextBank.setText(nextBankLetters);
 		//CDT.interrupt();
 		CDT = new countdownThread(20, this);
 		CDT.start();
@@ -519,7 +549,7 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 			case 3: 
 				pwpName = "Mortar Thief";
 		}
-		playerTwoPowerup.setText(pwpName);
+		playerOnePowerup.setText(pwpName);
 		myPowerup = powerup;
 	}
 	
@@ -538,6 +568,7 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 	
 	public void setOwner(int owner) {
 		wordOwnership[wallHeight] = owner;
+		System.out.println("Setting "+owner+"as owner of level" +wallHeight);
 	}
 	
 	/**
@@ -616,7 +647,6 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
         } else {
             startQuitButton.setText("Start");
         }
-        System.out.println("Hi");
     }
 	
 	public void powerupUsed(int powerup, int user) {
@@ -633,8 +663,8 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 	//clears the top two wallFields and updates wallHeight 
 	private void wreckingBall() {
 		for (int i = 2; i > 0; i--) {
-			wallFields[wallHeight].setText("");
 			wallHeight--;
+			wallFields[wallHeight].setText("");			
 		}
 	}
 	
@@ -645,6 +675,7 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 		for (int i = wallHeight - 1; i > 0; i--) {
 			if (wordOwnership[i] != user) {
 				wallFields[i].setForeground(NEUTRAL_COLOR);
+				break;
 			}
 		}
 	}
@@ -662,6 +693,7 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 		for (int i = wallHeight - 1; i > 0; i--) {
 			if (wordOwnership[i] != user) {
 				wallFields[i].setForeground(newColor);
+				break;
 			}
 		}
 	}
@@ -677,6 +709,7 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 		
 		if (e.getKeyCode() == KeyEvent.VK_F1) {
 			CL.update(myPowerup);
+			myPowerup = 0;
 		}
 	}
     
@@ -785,21 +818,3 @@ class countdownThread extends Thread {
 		}
 	}
 }
-/*
-class powerupListener implements KeyListener {
-	
-	client CL;
-	
-	public void KeyPressed(KeyEvent e) {
-		if (e.getKeyChar() == '1') {
-			CL.update(4);
-		}
-	}
-	
-	public void KeyTyped(KeyEvent e) {
-	}
-	
-	public void KeyReleased(KeyEvent e) {
-	}
-}
-*/
