@@ -483,7 +483,7 @@ class Game {
 								}
 							    // send wordWallUpdate for chisel
 								System.out.print((DEBUG)?"wordWallUpdate(" + flag + " " + scoreA + " " + scoreB + ") " + player.player + " " + opponent.player + "\n":"");
-								send("wordWallUpdate "+ flag + " " + scoreA + " " + scoreB + " placeholder", player, opponent);
+								send("wordWallUpdate "+ flag + " " + scoreA + " " + scoreB + " placeholder\n", player, opponent);
 								break;
 							//thief
 							case 3:
@@ -570,7 +570,7 @@ class Game {
 							if(powerUpFlag > 0){
 								// send setPowerup to player
 								System.out.print((DEBUG)?"setPowerup(" + powerUpFlag + ", player " + player.player+ ")\n":"");
-								send("setPowerup " + player.player + " " + powerUpFlag + "\n", player);
+								send("setPowerup " + player.player + " " + powerUpFlag + "\n", player, opponent);
 							}
 							
 						}
