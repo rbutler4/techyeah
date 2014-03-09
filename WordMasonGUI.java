@@ -305,13 +305,6 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
                 startQuitButtonPressed(evt);
             }
         });
-		
-		/*
-		inputField.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				inputFieldAltered(evt);
-			}
-		});*/
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -432,12 +425,6 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 			resetGameBoard();
         }
     }
-
-	/*
-	private void inputFieldAltered(java.awt.event.ActionEvent evt) {
-		invalidLabel.setText("");
-	}
-	*/
 	
 	/**
 	 *	Name: submitWord
@@ -479,6 +466,7 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
       
     }
     
+	//Activates the invalid label.
 	private void invalid() {
 		invalidLabel.setText("Invalid");
 	}
@@ -539,36 +527,46 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
         playerTwoScore.setText(Integer.toString(score));
     }
     
+	//Sets the powerup label for player one.
 	public void setPlayerOnePowerup(int powerup) {
 		String pwpName = "";
+		System.out.println("Setting my powerup: "+powerup);
 		switch (powerup) {
 			case 1:
 				pwpName = "Wrecking Ball";
+				break;
 			case 2: 
 				pwpName = "Chisel";
+				break;
 			case 3: 
 				pwpName = "Mortar Thief";
+				break;
 		}
 		playerOnePowerup.setText(pwpName);
 		myPowerup = powerup;
 	}
 	
+	//Sets the powerup label for player two.
 	public void setPlayerTwoPowerup(int powerup) {
 		String pwpName = "";
+		System.out.println("Setting opponent's powerup: "+powerup);
 		switch (powerup) {
 			case 1:
 				pwpName = "Wrecking Ball";
+				break;
 			case 2: 
 				pwpName = "Chisel";
+				break;
 			case 3: 
 				pwpName = "Mortar Thief";
+				break;
 		}
 		playerTwoPowerup.setText(pwpName);
 	}
 	
 	public void setOwner(int owner) {
 		wordOwnership[wallHeight] = owner;
-		System.out.println("Setting "+owner+"as owner of level" +wallHeight);
+		System.out.println("Setting "+owner+" as owner of level " +wallHeight);
 	}
 	
 	/**
@@ -649,22 +647,47 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
         }
     }
 	
+	//Name: powerupUsed
+	//Input: powerup, user flags 
+	//Description: handles GUI display of powerup effects
 	public void powerupUsed(int powerup, int user) {
+		//clear the powerup
+		if (user == 0) {
+			clearP1Powerup();
+		} else {
+			clearP2Powerup();
+		}
+		
+		//choose the appropriate method
 		switch (powerup) {
 			case 1:
 				wreckingBall();
+				break;
 			case 2:
 				chisel(user);
+				break;
 			case 3:
 				thief(user);
+				break;
 		}
 	}
+	
+	//Clears the player one powerup label
+	private void clearP1Powerup() {
+		playerOnePowerup.setText("");
+	}
+
+	//Clears the player two powerup label
+	private void clearP2Powerup() {
+		playerTwoPowerup.setText("");
+	}	
 	
 	//clears the top two wallFields and updates wallHeight 
 	private void wreckingBall() {
 		for (int i = 2; i > 0; i--) {
 			wallHeight--;
-			wallFields[wallHeight].setText("");			
+			wallFields[wallHeight].setText("");
+			wordOwnership[wallHeight] = -1;
 		}
 	}
 	
@@ -672,9 +695,12 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 	private void chisel(int user) {
 		//iterate through ownership array most -> least recent, identifying first word
 		//owned by powerup user's opponent
-		for (int i = wallHeight - 1; i > 0; i--) {
-			if (wordOwnership[i] != user) {
+		for (int i = wallHeight - 1; i >= 0; i--) {
+			int owner = wordOwnership[i];
+			System.out.println("Comparing user "+user+" with owner "+owner+" at height "+i);
+			if (owner != user && owner >= 0) {	//check if word is not the user's or neutral
 				wallFields[i].setForeground(NEUTRAL_COLOR);
+				wordOwnership[i] = -1;
 				break;
 			}
 		}
@@ -690,21 +716,27 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 		}
 		//iterate through ownership array most -> least recent, identifying first word
 		//owned by powerup user's opponent
-		for (int i = wallHeight - 1; i > 0; i--) {
-			if (wordOwnership[i] != user) {
+		for (int i = wallHeight - 1; i >= 0; i--) {
+			int owner = wordOwnership[i];
+			System.out.println("Comparing user "+user+" with owner "+owner+" at height "+i);
+			if (owner != user && owner >= 0) {	//check if word is not the user's or neutral
 				wallFields[i].setForeground(newColor);
+				wordOwnership[i] = user;
 				break;
 			}
 		}
 	}
 	
-	public void keyPressed(KeyEvent e) {
-		
+	//Overrides KeyListener method (unused)
+	public void keyPressed(KeyEvent e) {		
 	}
 	
+	//Overrides KeyListener method (unused)
 	public void keyTyped(KeyEvent e) {
 	}
 	
+	//If F1 has been typed, send a signal through the client and relinquish the powerup.
+	//Does nothing if no powerup is possessed.
 	public void keyReleased(KeyEvent e) {
 		
 		if (e.getKeyCode() == KeyEvent.VK_F1) {
