@@ -30,6 +30,7 @@ public class client{
 	private static String nextBank = null;
 	private static int playerScoreA;
 	private static int playerScoreB;
+	private static boolean wreckUsed;
 
 	// CONSTRUCTOR
 	// name:   client
@@ -127,7 +128,8 @@ public class client{
 		if(sock != null && output != null && input != null){
 			// send message
 			output.println("update "+flag);
-			System.out.print((DEBUG)?"update "+flag+"\n":"");
+			if (flag == 1) wreckUsed = true;
+			System.out.print((DEBUG)?"update "+flag+" wreckUsed: "+wreckUsed+"\n":"");
 		} else {
 			System.out.print((DEBUG)?"update: not connected\n":"");
 		}
@@ -212,17 +214,31 @@ public class client{
 								break;
 							// use powerup
 							default:
-								int user; 
+								int user;
+								//player A's score has decreased, player is A: opponent used powerup		
 								if (playerScoreA > scoreA && player == 'A') {
 									user = 1;
+								//player B's score has decreased, player is B: opponent used powerup	
 								} else if (playerScoreB > scoreB && player == 'B') {
 									user = 1;
+								//special case: thief or chisel used when opponent has no words
+								//(no effect)		
+								} else if (playerScoreA == scoreA && playerScoreB == scoreB
+									&& flag != 1) {
+									break;
 								} else {
 									user = 0;
 								}	
 								
+								//can't use score to tell who used wrecking ball, so 
+								//check if wreckUsed has recently been set to true
+								if (flag == 1 && wreckUsed == false) {
+									user = 1;
+								}
+								
 								GUI.powerupUsed(flag, user);
-								System.out.println((DEBUG)?"Powerup used: " + player + ", " + flag:"");
+								wreckUsed = false;
+								System.out.println((DEBUG)?"Powerup used: " + user + ", " + flag:"");
 								if (player == 'A') {
 									GUI.setPlayerOneScore(scoreA);
 									GUI.setPlayerTwoScore(scoreB);

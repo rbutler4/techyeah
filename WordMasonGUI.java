@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  */
 public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 	
-	
+	private boolean DEBUG = true;
     private int wallHeight;
     private JTextField[] wallFields;
     private String currBankLetters;
@@ -33,6 +33,7 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 	private Color PLAYER_COLOR = new Color(67, 127, 146);
 	private Color OPPONENT_COLOR = new Color(200, 0, 0);
 	private Color NEUTRAL_COLOR = new Color(105, 105, 105);
+	private Dimension LABEL_SIZE =  new Dimension(100, 17);
 	private int myPowerup;
 	
     /**
@@ -136,13 +137,20 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 
         playerOneScoreLabel.setText("<html> Your <br> score </html>");
 
-        playerTwoScore.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        playerTwoScore.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         playerTwoScore.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         playerTwoScore.setText("0");
+		playerTwoScore.setPreferredSize(LABEL_SIZE);
 
-        playerOneScore.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        playerOneScore.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         playerOneScore.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         playerOneScore.setText("0");
+		playerOneScore.setPreferredSize(LABEL_SIZE);
+		
+		//invalidLabel.setPreferredSize(LABEL_SIZE);
+		
+		//playerOnePowerup.setFont(new java.awt.Font("Tahoma", 2, 14));
+		//playerTwoPowerup.setFont(new java.awt.Font("Tahoma", 2, 14));
 
         wallField16.setEditable(false);
         wallField16.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
@@ -318,7 +326,7 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
                             .addComponent(playerOneScoreLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(11, 11, 11)
-                                .addComponent(playerOneScore))
+                                .addComponent(playerOneScore))	
 							.addComponent(playerOnePowerup, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -337,9 +345,9 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
                                 .addComponent(nextBank))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(startQuitButton)
-                                .addGap(81, 81, 81)
-								.addComponent(invalidLabel)
-								.addGap(20, 20, 20)
+                                .addGap(20, 20, 20)
+								.addComponent(invalidLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+								//.addGap(20, 20, 20)
                                 .addComponent(inputField, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(submitButton)))
@@ -367,18 +375,21 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
                                         .addComponent(playerOneScoreLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(playerOneScore)
+										.addGap(20, 20, 20)
 										.addComponent(playerOnePowerup))
                                     .addGroup(layout.createSequentialGroup()
                                         .addGap(24, 24, 24)
                                         .addComponent(playerTwoScoreLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(playerTwoScore)
+										.addGap(20, 20, 20)
 										.addComponent(playerTwoPowerup)))
                                 .addGap(0, 0, Short.MAX_VALUE))
                             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(submitButton)
+                            .addGap(5, 5, 5)
+							.addComponent(submitButton)
 							.addComponent(invalidLabel)
 							.addGap(5, 5, 5)
                             .addGroup(layout.createSequentialGroup()
@@ -440,6 +451,8 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
         int lettersUsed = 0;
 		
 		invalidLabel.setText("");
+		//invalidLabel.setSize(LABEL_SIZE);
+
 		
         for (int i = 0; i < bankChars.length; i++) {
             char bankLetter = bankChars[i];
@@ -504,6 +517,7 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 		CDT.start();
     }
     
+	//Updates the timer in nextBank. Called by countdownThread every second.
 	public void setNextBankTimer(int time) {
 		nextBankLabel.setText("Next bank in " + time + " seconds: ");
 	}
@@ -530,16 +544,16 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 	//Sets the powerup label for player one.
 	public void setPlayerOnePowerup(int powerup) {
 		String pwpName = "";
-		System.out.println("Setting my powerup: "+powerup);
+		System.out.println((DEBUG)?"Setting my powerup: "+powerup:"");
 		switch (powerup) {
 			case 1:
-				pwpName = "Wrecking Ball";
+				pwpName = "<html>Wrecking<br>Ball</html>";
 				break;
 			case 2: 
 				pwpName = "Chisel";
 				break;
 			case 3: 
-				pwpName = "Mortar Thief";
+				pwpName = "<html>Mortar<br>Thief</html>";
 				break;
 		}
 		playerOnePowerup.setText(pwpName);
@@ -549,16 +563,16 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 	//Sets the powerup label for player two.
 	public void setPlayerTwoPowerup(int powerup) {
 		String pwpName = "";
-		System.out.println("Setting opponent's powerup: "+powerup);
+		System.out.println((DEBUG)?"Setting opponent's powerup: "+powerup:"");
 		switch (powerup) {
 			case 1:
-				pwpName = "Wrecking Ball";
+				pwpName = "<html>Wrecking<br>Ball</html>";
 				break;
 			case 2: 
 				pwpName = "Chisel";
 				break;
 			case 3: 
-				pwpName = "Mortar Thief";
+				pwpName = "<html>Mortar<br>Thief</html>";
 				break;
 		}
 		playerTwoPowerup.setText(pwpName);
@@ -566,7 +580,7 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 	
 	public void setOwner(int owner) {
 		wordOwnership[wallHeight] = owner;
-		System.out.println("Setting "+owner+" as owner of level " +wallHeight);
+		System.out.println((DEBUG)?"Setting "+owner+" as owner of level " +wallHeight:"");
 	}
 	
 	/**
@@ -653,6 +667,7 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 	public void powerupUsed(int powerup, int user) {
 		//clear the powerup
 		if (user == 0) {
+			myPowerup = 0;
 			clearP1Powerup();
 		} else {
 			clearP2Powerup();
@@ -685,9 +700,11 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 	//clears the top two wallFields and updates wallHeight 
 	private void wreckingBall() {
 		for (int i = 2; i > 0; i--) {
-			wallHeight--;
-			wallFields[wallHeight].setText("");
-			wordOwnership[wallHeight] = -1;
+			if (wallHeight > 0) {
+				wallHeight--;
+				wallFields[wallHeight].setText("");
+				wordOwnership[wallHeight] = -1;
+			}
 		}
 	}
 	
@@ -697,7 +714,7 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 		//owned by powerup user's opponent
 		for (int i = wallHeight - 1; i >= 0; i--) {
 			int owner = wordOwnership[i];
-			System.out.println("Comparing user "+user+" with owner "+owner+" at height "+i);
+			System.out.println((DEBUG)?"Comparing user "+user+" with owner "+owner+" at height "+i:"");
 			if (owner != user && owner >= 0) {	//check if word is not the user's or neutral
 				wallFields[i].setForeground(NEUTRAL_COLOR);
 				wordOwnership[i] = -1;
@@ -718,7 +735,7 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 		//owned by powerup user's opponent
 		for (int i = wallHeight - 1; i >= 0; i--) {
 			int owner = wordOwnership[i];
-			System.out.println("Comparing user "+user+" with owner "+owner+" at height "+i);
+			System.out.println((DEBUG)?"Comparing user "+user+" with owner "+owner+" at height "+i:"");
 			if (owner != user && owner >= 0) {	//check if word is not the user's or neutral
 				wallFields[i].setForeground(newColor);
 				wordOwnership[i] = user;
@@ -741,7 +758,6 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 		
 		if (e.getKeyCode() == KeyEvent.VK_F1) {
 			CL.update(myPowerup);
-			myPowerup = 0;
 		}
 	}
     
