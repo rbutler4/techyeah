@@ -88,6 +88,7 @@ public class WordMasonServer {
 					// reap playerOne
 					game.send("timeOut true\n", playerOne);
 				}
+                System.out.print((DEBUG)?"Server while(true) loop\n":"");
 			}
 		} finally {
 			listener.close();
@@ -130,6 +131,16 @@ class Game {
 		usedWords = new ArrayList<String>();
 		//playerWords = new ArrayList<String>();
 		//opponentWords = new ArrayList<String>();
+        
+        // initalize game global variables
+        this.exit = false;
+        this.scoreA = 0;
+        this.scoreB = 0;
+        this.wallHeight = 0;
+        this.wall.clear();
+        this.usedWords.clear();
+        this.letterBankList.clear();
+        this.nextletterBankList.clear();
 
 		int totalCount;
 		try{
@@ -146,6 +157,8 @@ class Game {
 	     } catch (IOException e) {
 	         e.printStackTrace();
 	     }
+        
+        System.out.print((DEBUG)?"new Game initalized\n":"");
 	}
 
 	// name:   run
@@ -197,6 +210,13 @@ class Game {
 				timeStamp2 = System.currentTimeMillis();
 			}
 		}
+        
+        // game is over, ask player threads to die
+        System.out.print((DEBUG)?"players "+player.player+" "+opponent.player+" set to null...":"");
+        player = null;
+        opponent = null;
+        System.out.print((DEBUG)?" done\n":"");
+        
 	}
 
 	// name:   getLetterBank
