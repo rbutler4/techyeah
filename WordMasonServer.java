@@ -185,7 +185,7 @@ class Game {
 				send("letterBankUpdate " + letterBankString, player, opponent);
 			} else {
 				// copy nextletterbanklist to letterbanklist
-				letterBankList = new ArrayList(nextletterBankList);
+				letterBankList = new ArrayList<Character>(nextletterBankList);
 				// generate new bank, set as next bank, and send to clients
 				letterBankString = getLetterBank();
 				nextletterBankList = getLetterList(letterBankString);

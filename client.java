@@ -338,6 +338,7 @@ public class client{
 							GUI.setPlayerTwoScore(scoreA);
 							GUI.gameOverDialog();
 						}
+						playerScoreA = playerScoreB = 0;
 					} else {
 						System.out.print((DEBUG)?"invalid endGame\n":"");
 					}
