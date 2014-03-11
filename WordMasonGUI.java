@@ -79,6 +79,10 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 		startQuitButton.addKeyListener(this);
 		submitButton.addKeyListener(this);
 		
+		for (int i = 0; i < wallFields.length; i++) {
+			wordOwnership[i] = -1;
+        }
+			
 		this.setSize(new Dimension(350, 600));
 		this.setResizable(false);
     }
@@ -408,9 +412,13 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
     private void resetGameBoard() {
 		for (int i = 0; i < wallFields.length; i++) {
             wallFields[i].setText("");
+			wordOwnership[i] = -1;
         }
 		setPlayerOneScore(0);
 		setPlayerTwoScore(0);
+		playerOnePowerup.setText("");
+		playerTwoPowerup.setText("");
+		myPowerup = 0;
 		wallHeight = 0;
 		inputField.setText("");
 		currBank.setText("");

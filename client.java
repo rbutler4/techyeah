@@ -248,6 +248,9 @@ public class client{
 								}
 								break;
 						}
+						//update tracking of player scores
+						playerScoreA = scoreA;
+						playerScoreB = scoreB;
 					} else {
 						System.out.print((DEBUG)?"invalid wordWallUpdate\n":"");
 					}
