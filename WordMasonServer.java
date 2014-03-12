@@ -42,7 +42,7 @@ public class WordMasonServer {
 	// set DEBUG to false to turn off debug info for WordMasonServer
 	private static final Boolean DEBUG = true;
 	private static final int DEFAULT_PORT = 5000;
-	private static final int TIMEOUT = 2000;	// 2 seconds for testing
+	private static final int TIMEOUT = 60000;	// 60 seconds for testing
 	private static int port;
 
 	public static void main(String[] args) throws Exception {
