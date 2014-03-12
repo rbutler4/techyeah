@@ -1,5 +1,5 @@
 /*
-*	Java threaded Client
+*	Java threaded WordMasonClient
 *	iteration 2.3
 *	Tech Yeah!
 */
@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class client{
+public class WordMasonClient{
 	// set DEBUG to false to turn off debug info
 	private static final Boolean DEBUG = true;
 	private static final String DEFAULT_HOST = "127.0.0.1";
@@ -33,11 +33,11 @@ public class client{
 	private static boolean wreckUsed;
 
 	// CONSTRUCTOR
-	// name:   client
+	// name:   WordMasonClient
 	// input:  [none]
 	// output: [none]
 	// description:  sets host and port to defaults
-	public client(){
+	public WordMasonClient(){
 		host = DEFAULT_HOST;
 		port = DEFAULT_PORT;
 
@@ -46,11 +46,11 @@ public class client{
 	}
 
 	// CONSTRUCTOR
-	// name:   client
+	// name:   WordMasonClient
 	// input:  String
 	// output: [none]
 	// description:  sets port to default and host to input if valid, else default
-	public client(String hos){
+	public WordMasonClient(String hos){
 		host = DEFAULT_HOST;
 		port = DEFAULT_PORT;
 
@@ -66,11 +66,11 @@ public class client{
 	}
 
 	// CONSTRUCTOR
-	// name:   client
+	// name:   WordMasonClient
 	// input:  int
 	// output: [none]
 	// description:  sets host to default and port to input if valid, else default
-	public client(int por){
+	public WordMasonClient(int por){
 		host = DEFAULT_HOST;
 		port = DEFAULT_PORT;
 
@@ -86,11 +86,11 @@ public class client{
 	}
 
 	// CONSTRUCTOR
-	// name:   client
+	// name:   WordMasonClient
 	// input:  String, int
 	// output: [none]
 	// description:  sets host and port to input if valid, else defaults
-	public client(String hos, int por){
+	public WordMasonClient(String hos, int por){
 		host = DEFAULT_HOST;
 		port = DEFAULT_PORT;
 
@@ -417,7 +417,7 @@ class listenThread extends Thread{
 					
 					// parse input
 					if(temp != null){
-						client.parse(temp);
+						WordMasonClient.parse(temp);
 					}
 				}
 
