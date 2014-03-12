@@ -1,5 +1,5 @@
 /*
-*	Java threaded Client
+*	Java threaded WordMasonClient
 *	iteration 2.3
 *	Tech Yeah!
 */
@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class client{
+public class WordMasonClient{
 	// set DEBUG to false to turn off debug info
 	private static final Boolean DEBUG = true;
 	private static final String DEFAULT_HOST = "127.0.0.1";
@@ -30,13 +30,14 @@ public class client{
 	private static String nextBank = null;
 	private static int playerScoreA;
 	private static int playerScoreB;
+	private static boolean wreckUsed;
 
 	// CONSTRUCTOR
-	// name:   client
+	// name:   WordMasonClient
 	// input:  [none]
 	// output: [none]
 	// description:  sets host and port to defaults
-	public client(){
+	public WordMasonClient(){
 		host = DEFAULT_HOST;
 		port = DEFAULT_PORT;
 
@@ -45,11 +46,11 @@ public class client{
 	}
 
 	// CONSTRUCTOR
-	// name:   client
+	// name:   WordMasonClient
 	// input:  String
 	// output: [none]
 	// description:  sets port to default and host to input if valid, else default
-	public client(String hos){
+	public WordMasonClient(String hos){
 		host = DEFAULT_HOST;
 		port = DEFAULT_PORT;
 
@@ -65,11 +66,11 @@ public class client{
 	}
 
 	// CONSTRUCTOR
-	// name:   client
+	// name:   WordMasonClient
 	// input:  int
 	// output: [none]
 	// description:  sets host to default and port to input if valid, else default
-	public client(int por){
+	public WordMasonClient(int por){
 		host = DEFAULT_HOST;
 		port = DEFAULT_PORT;
 
@@ -85,11 +86,11 @@ public class client{
 	}
 
 	// CONSTRUCTOR
-	// name:   client
+	// name:   WordMasonClient
 	// input:  String, int
 	// output: [none]
 	// description:  sets host and port to input if valid, else defaults
-	public client(String hos, int por){
+	public WordMasonClient(String hos, int por){
 		host = DEFAULT_HOST;
 		port = DEFAULT_PORT;
 
@@ -127,7 +128,8 @@ public class client{
 		if(sock != null && output != null && input != null){
 			// send message
 			output.println("update "+flag);
-			System.out.print((DEBUG)?"update "+flag+"\n":"");
+			if (flag == 1) wreckUsed = true;
+			System.out.print((DEBUG)?"update "+flag+" wreckUsed: "+wreckUsed+"\n":"");
 		} else {
 			System.out.print((DEBUG)?"update: not connected\n":"");
 		}
@@ -212,17 +214,31 @@ public class client{
 								break;
 							// use powerup
 							default:
-								int user; 
+								int user;
+								//player A's score has decreased, player is A: opponent used powerup		
 								if (playerScoreA > scoreA && player == 'A') {
 									user = 1;
+								//player B's score has decreased, player is B: opponent used powerup	
 								} else if (playerScoreB > scoreB && player == 'B') {
 									user = 1;
+								//special case: thief or chisel used when opponent has no words
+								//(no effect)		
+								} else if (playerScoreA == scoreA && playerScoreB == scoreB
+									&& flag != 1) {
+									break;
 								} else {
 									user = 0;
 								}	
 								
+								//can't use score to tell who used wrecking ball, so 
+								//check if wreckUsed has recently been set to true
+								if (flag == 1 && wreckUsed == false) {
+									user = 1;
+								}
+								
 								GUI.powerupUsed(flag, user);
-								System.out.println((DEBUG)?"Powerup used: " + player + ", " + flag:"");
+								wreckUsed = false;
+								System.out.println((DEBUG)?"Powerup used: " + user + ", " + flag:"");
 								if (player == 'A') {
 									GUI.setPlayerOneScore(scoreA);
 									GUI.setPlayerTwoScore(scoreB);
@@ -232,6 +248,9 @@ public class client{
 								}
 								break;
 						}
+						//update tracking of player scores
+						playerScoreA = scoreA;
+						playerScoreB = scoreB;
 					} else {
 						System.out.print((DEBUG)?"invalid wordWallUpdate\n":"");
 					}
@@ -319,6 +338,7 @@ public class client{
 							GUI.setPlayerTwoScore(scoreA);
 							GUI.gameOverDialog();
 						}
+						playerScoreA = playerScoreB = 0;
 					} else {
 						System.out.print((DEBUG)?"invalid endGame\n":"");
 					}
@@ -397,7 +417,7 @@ class listenThread extends Thread{
 					
 					// parse input
 					if(temp != null){
-						client.parse(temp);
+						WordMasonClient.parse(temp);
 					}
 				}
 

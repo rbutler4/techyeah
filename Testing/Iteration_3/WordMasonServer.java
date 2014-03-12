@@ -42,7 +42,7 @@ public class WordMasonServer {
 	// set DEBUG to false to turn off debug info for WordMasonServer
 	private static final Boolean DEBUG = true;
 	private static final int DEFAULT_PORT = 5000;
-	private static final int TIMEOUT = 2000;	// 2 seconds for testing
+	private static final int TIMEOUT = 60000;	// 60 seconds for testing
 	private static int port;
 
 	public static void main(String[] args) throws Exception {
@@ -88,6 +88,7 @@ public class WordMasonServer {
 					// reap playerOne
 					game.send("timeOut true\n", playerOne);
 				}
+                System.out.print((DEBUG)?"Server while(true) loop\n":"");
 			}
 		} finally {
 			listener.close();
@@ -130,6 +131,16 @@ class Game {
 		usedWords = new ArrayList<String>();
 		//playerWords = new ArrayList<String>();
 		//opponentWords = new ArrayList<String>();
+        
+        // initalize game global variables
+        this.exit = false;
+        this.scoreA = 0;
+        this.scoreB = 0;
+        this.wallHeight = 0;
+        this.wall.clear();
+        this.usedWords.clear();
+        this.letterBankList.clear();
+        this.nextletterBankList.clear();
 
 		int totalCount;
 		try{
@@ -146,6 +157,8 @@ class Game {
 	     } catch (IOException e) {
 	         e.printStackTrace();
 	     }
+        
+        System.out.print((DEBUG)?"new Game initalized\n":"");
 	}
 
 	// name:   run
@@ -172,7 +185,7 @@ class Game {
 				send("letterBankUpdate " + letterBankString, player, opponent);
 			} else {
 				// copy nextletterbanklist to letterbanklist
-				letterBankList = new ArrayList(nextletterBankList);
+				letterBankList = new ArrayList<Character>(nextletterBankList);
 				// generate new bank, set as next bank, and send to clients
 				letterBankString = getLetterBank();
 				nextletterBankList = getLetterList(letterBankString);
@@ -197,6 +210,13 @@ class Game {
 				timeStamp2 = System.currentTimeMillis();
 			}
 		}
+        
+        // game is over, ask player threads to die
+        System.out.print((DEBUG)?"players "+player.player+" "+opponent.player+" set to null...":"");
+        player = null;
+        opponent = null;
+        System.out.print((DEBUG)?" done\n":"");
+        
 	}
 
 	// name:   getLetterBank
