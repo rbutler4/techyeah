@@ -1,13 +1,3 @@
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-//package wordmason;
-
-//import wordmason.client;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -25,12 +15,12 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
     private JTextField[] wallFields;
     private String currBankLetters;
     private String nextBankLetters;
-    private client CL;
+    private WordMasonClient CL;
     private countdownThread CDT;
     private static String hostname = "";
     private static int port = -1;
 	private int[] wordOwnership;
-	private Color PLAYER_COLOR = new Color(67, 127, 146);
+	private Color PLAYER_COLOR = new Color(0, 56, 186);
 	private Color OPPONENT_COLOR = new Color(200, 0, 0);
 	private Color NEUTRAL_COLOR = new Color(105, 105, 105);
 	private Dimension LABEL_SIZE =  new Dimension(100, 17);
@@ -65,16 +55,16 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
      
         toggleGameState(false);
         if (port > 0 && !hostname.equals("")) {
-			CL = new client(hostname, port);
+			CL = new WordMasonClient(hostname, port);
 		} else if (port > 0) {
-            CL = new client(port);
+            CL = new WordMasonClient(port);
         } else if (!hostname.equals("")) {
-			CL = new client(hostname);
+			CL = new WordMasonClient(hostname);
 		} else {
-			CL = new client();
+			CL = new WordMasonClient();
 		}
-        CL.setGUI(this);    // lets client know to talk to this GUI
-        this.getRootPane().setDefaultButton(submitButton);
+        CL.setGUI(this);    // lets WordMasonClient know to talk to this GUI
+		this.getRootPane().setDefaultButton(submitButton);	//allows submission w/ enter key
 		inputField.addKeyListener(this);
 		startQuitButton.addKeyListener(this);
 		submitButton.addKeyListener(this);
@@ -430,8 +420,8 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 	/**
 	 *	Name: startQuitButtonPressed
  	 *	Input: a JButton action event (button is clicked)
-	 *	Description: if button reads "start", connects client to game server and enables game. 
-	 *	If "quit", tells client to send server quit signal and disables game.
+	 *	Description: if button reads "start", connects WordMasonClient to game server and enables game. 
+	 *	If "quit", tells WordMasonClient to send server quit signal and disables game.
 	 */    
     private void startQuitButtonPressed(java.awt.event.ActionEvent evt) {                                        
         String buttonText = startQuitButton.getText();
@@ -449,7 +439,7 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 	 *	Name: submitWord
 	 *	Input: a string representing a player-entered word
 	 *	Description: checks if word consists only of letters in the bank. If yes, passes the
-	 *		word to the client for submission. If no, notifies the player that word is invalid.
+	 *		word to the WordMasonClient for submission. If no, notifies the player that word is invalid.
 	 */	
     private void submitWord(String word) {
         currBankLetters = currBankLetters.toUpperCase();
@@ -760,7 +750,7 @@ public class WordMasonGUI extends javax.swing.JFrame implements KeyListener {
 	public void keyTyped(KeyEvent e) {
 	}
 	
-	//If F1 has been typed, send a signal through the client and relinquish the powerup.
+	//If F1 has been typed, send a signal through the WordMasonClient and relinquish the powerup.
 	//Does nothing if no powerup is possessed.
 	public void keyReleased(KeyEvent e) {
 		
