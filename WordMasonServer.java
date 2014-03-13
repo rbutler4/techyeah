@@ -238,7 +238,7 @@ class Game {
 		vowels.add('o');
 		vowels.add('u');
 		
-		for (int i =0; i <3; i++){
+		for (int i = 0; i < 3; i++){
 			randomlySelected = generator.nextInt(5);
 			newLetter = vowels.get(randomlySelected);
 			newBank += newLetter;
@@ -266,18 +266,18 @@ class Game {
 		consonants.add('y');
 		consonants.add('z');
 		
-		for (int i =21; i >16; i--){
+		for (int i = 21; i > 16; i--){
 			randomlySelected = generator.nextInt(i);
 			newLetter = consonants.get(randomlySelected);
 			consonants.remove(randomlySelected);
 			newBank += newLetter;
 		}
-		for (int i = 0; i < 7; i++){
+		for (int i = 0; i < 9; i++){
 			randomlySelected = generator.nextInt(alphabet.length());
 			newLetter = alphabet.charAt(randomlySelected);
 			newBank += newLetter;
 		}
-		for (int i =5; i >2; i--){
+		for (int i = 5; i > 2; i--){
 			randomlySelected = generator.nextInt(i);
 			newLetter = vowels.get(randomlySelected);
 			vowels.remove(randomlySelected);
